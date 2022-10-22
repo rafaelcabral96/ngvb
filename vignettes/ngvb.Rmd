@@ -1,0 +1,366 @@
+---
+title: "ngvb"
+output: rmarkdown::html_vignette
+bibliography: references.bib  
+vignette: >
+  %\VignetteIndexEntry{ngvb}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(ngvb)
+```
+
+
+Latent Gaussian models (LGMs) assume that the latent variables $\mathbf{x}^G$ follow a Gaussian random vector with mean $\mathbf{\mu}$  and precision matrix $\mathbf{Q}=  \mathbf{\mathbf{D}}^T \mathbf{D}$. It can be expressed through \begin{equation}\label{eq:gaussian}
+\mathbf{D}(\mathbf{x}^G -\mathbf{\mu})\overset{d}{=} \mathbf{Z},
+\end{equation}
+where $\mathbf{Z}$ is a vector of i.i.d. standard Gaussian variables. Models of this type can be fitted with `inla`. The non-Gaussian extension for $\mathbf{x}^G$ consists in replacing the driving noise distribution:
+\begin{equation}\label{eq:frame}
+\mathbf{D}(\mathbf{x}-\mathbf{\mu})\overset{d}{=} \mathbf{\Lambda},
+\end{equation}
+where $\boldsymbol{\Lambda}$ is a vector of independent and standardized normal-inverse Gaussian (NIG) random variables that depend on the parameter $\eta$, which controls the leptokurtosis. This extension leads to latent non-Gaussian models (LnGMs). The package `ngvb` is designed to fit these models. `ngvb` is based on a variational Bayes algorithm. It leverages the fact that the conditioned latent field $\mathbf{x}|\mathbf{V}$ is normally distributed where $\mathbf{V}$ are inverse-Gaussian mixing variables that regulate the extra flexibility of the model.
+
+We assume the user is familiar with the INLA package (@gomez2020bayesian). Latent non-Gaussian models are discussed in @cabral2022controlling, and a Bayesian implementation of LnGMs in Stan can be found in [rafaelcabral96.github.io/nigstan/](rafaelcabral96.github.io/nigstan/). We present next a series of examples on how to use the `ngvb` package.
+
+# AR1 model
+
+Here we fit an AR1 latent process to the `jumpts` time series.
+
+```{r, fig.height=5, fig.width=7}
+plot(jumpts)
+```
+
+The model is the following:
+
+$$
+y_i = \sigma_x x_i + \sigma_y \epsilon_i,    
+$$
+
+where $\epsilon_i$ is standard Gaussian noise, and $\mathbf{x}=[x_1,\dotsc,x_{100}]^T$ follows a non-Gaussian AR1 prior, defined by $x_{i}=\rho x_{i-1} + \Lambda_i, i=2,\dotsc,100$, where $\rho$ is the autocorrelation and $\Lambda_i$ is normal-inverge Gaussian (NIG) noise with non-Gaussianity  parameter $\eta$.
+
+We define the prior on $\tau_y = \sigma_y^{-2}$:
+```{r}
+prec.prior <- list(prec = list(prior = "loggamma", param = c(1, 0.1)))
+```
+and the prior on $\tau_x = \sigma_x^{-2}$ and $\rho$:
+```{r}
+prior.list <- list(theta1 = list(prior = "pc.prec", param = c(1,0.1)),
+                   theta2 = list(prior = "pc.cor0", param = c(0.5,0.5)))
+```
+
+First, we start by fitting a latent Gaussian model (LGM), where the driving noise of the latent field is normally distributed:
+
+```{r}
+formula <- y ~ -1 + f(x,  model = "ar1", hyper = prior.list) 
+LGM     <- inla(formula, 
+                data = jumpts,
+                control.family = list(hyper = prec.prior))
+```
+
+Next, we consider the non-Gaussian version of the previous model, where the latent field is driven by NIG noise. We use the output of the `inla` function `LGM` as the input of the `ngvb` function. First, we need to specify which components will be made non-Gaussian in the `selection` argument. In this case, the AR1 component has the name `x` and dimension 100, so we write `selection = list(x=1:100)`. By default, the leptokurtosis parameter $\eta$ has an exponential prior with rate parameter equal to 1. This can be changed with the argument `alpha.eta`. Run `?ngvb` to see the other arguments.  
+
+```{r}
+LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+```
+
+
+`LnGM` is an S4 object of class `ngvb.list` containing the outputs, which can be accessed with `LnGM@...`.
+Available methods are `summary`, `print`, `plot`, `fitted`, and `simulate`. To read the help functions, run:
+```{r}
+#?`summary,ngvb.list-method`
+#?`print,ngvb.list-method`
+#?`plot,ngvb.list,missing-method`
+#?`fitted,ngvb.list-method`
+#?`simulate,ngvb.list-method`
+```
+
+We can see in `plot(LnGM)` that the two jump locations were picked up by the mixing variables $V$ (which add more flexibility on those locations), and the evolution of the parameter $\eta$ seems to indicate convergence.
+
+```{r, fig.height=5, fig.width=7}
+plot(LnGM)
+```
+
+`LnGM@LGM` contains the inla object containing summaries and marginals of the LGM approximation of $(x,\theta)$ for the last iteration. We show next the log-evidence for each model:
+
+```{r}
+LGM$mlik[2]
+LnGM@LGM$mlik[2]
+```
+
+
+# Random slople, random intercept model (several model components)
+
+
+We fit here growth curves from an orthodontic study including several male and female children at ages 8,10,12, and 14. For more information and references, run `?mice::potthoffroy`. Next, we show a Trellis plot, where female subjects have labels starting with F and male subjects starting with M.
+
+```{r, fig.height=5, fig.width=7}
+plot(Orthodont.plot, layout = c(16,2))
+```
+
+We use the following linear mixed-effects model to describe the response growth with age:
+
+$$
+y_{i j}=\beta_0+\delta_0 I_i(F) &+\left(\beta_1+\delta_1 I_i(F)\right) t_j + b_{0 i}+b_{1 i} t_j+\epsilon_{i j},
+$$
+
+where $y_{i j}$ denotes the response for the $i$th subject at age $t_j$, $i=1, \ldots, 27$ and  $j=1, \ldots, 4$ ; $\beta_0$ and $\beta_1$ denote, respectively, the intercept and the slope fixed effects for boys; $\delta_0$ and $\delta_1$ denote, respectively, the difference in intercept and slope fixed effects between girls and boys; $I_i(F)$ denotes an indicator variable for females; $\mathbf{b}_i=\left(b_{0 i}, b_{1 i}\right)$ is the random effects vector for the $i$ th subject; and $\epsilon_{i j}$ is the within-subject error.
+
+The dataset is:
+```{r}
+summary(Orthodont)
+```
+
+If the random effects have a normal prior, the previous model is an LGM that can be fitted in INLA. The random intercept is elicited in `formula` by `f(subject, model = "iid")`, and the random  slopes by `f(subject2, time, model = "iid")`. The covariates `subject1` and `subject2` are the same since the f()-terms in INLA should depend on the unique names of the covariates. 
+
+```{r}
+formula <- value ~ 1 + Female + time + tF + f(subject, model = "iid") + f(subject2, time, model = "iid")
+
+LGM <- inla(formula,
+            data = Orthodont)
+```
+
+We consider the prior random effects to be distributed according to long-tailed NIG variables to accommodate possible outliers in the intercepts and slopes.
+
+```{r, fig.height=5, fig.width=7}
+LnGM <- ngvb(LGM, selection = list(subject = 1:27, subject2 = 1:27))
+
+plot(LnGM)
+```
+
+For the random slopes (subject2), the posterior means of the mixing variables $V$ are very close to 1, and $\eta$ is close to 0, suggesting that a non-Gaussian model for this component is not necessary.
+
+We show next the log-evidence for each model:
+```{r}
+LGM$mlik[2]
+LnGM@LGM$mlik[2]
+```
+
+# SAR model (using manual.configs)
+
+Here we demonstrate how to fit LnGM models currently unavailable in `ngvb` or `inla` using the rgeneric functionality of `inla` and the `manual.configs` argument of `ngvb`.
+
+We study here areal data, which consists of the number of residential burglaries and vehicle thefts per thousand households ($y_i$) in 49 counties of Columbus, Ohio, in 1980. This dataset can be found in the `spdep` package. We consider the following model:
+\begin{equation} 
+y_{i}= \beta_0 + \beta_1 \mathrm{HV}_i + \beta_2 \mathrm{HI}_i +  \sigma_{\mathbf{x}}x_i + \sigma_{\epsilon}\epsilon_i,  
+(\#eq:columbus)
+\end{equation} 
+where $\mathrm{HV}_i$ and $\mathrm{HI}_i$ are the average household value and household income for county $i$, and $\mathbf{x}$ accounts for structured spatial effects, while $\epsilon_i \overset{i.i.d}{\sim} N(0,1)$ is an unstructured spatial effect. 
+
+
+We consider a simultaneous autoregressive (SAR) model for the spatially structured effects $\mathbf{x}$. The Gaussian version of this model can be built from the following system $\mathbf{D}_{SAR}\mathbf{x} = \sigma_{\mathbf{x}}\mathbf{Z}$, where $\mathbf{D}_{SAR}=\mathbf{I}-\rho\mathbf{W}$. $\mathbf{W}$ is a row standardized adjacency matrix and $-1<\rho<1$. The equivalent model driven by NIG noise is then $\mathbf{D}_{SAR}\mathbf{x} = \sigma_{\mathbf{x}}\mathbf{\Lambda}$, where $\mathbf{\Lambda}$ is i.i.d. standardized NIG noise. 
+
+Gaussian SAR models are not implemented in INLA, so we have to use the `rgeneric` or `cgeneric` functionalities (@gomez2020bayesian). We start by loading the data and constructing the matrix $\mathbf{W}$ 
+
+
+```{r message=FALSE, warning=FALSE, fig.height=5, fig.width=7}
+#install.packages("spdep")
+#install.packages("rgdal")
+library(spdep)                # Columbus dataset
+library(rgdal)                # Read polygon data
+
+data(columbus)
+data    <- columbus[,c("CRIME","HOVAL","INC")]       # data
+N    <- nrow(data)                                   # number of counties
+data$s  <- 1:N 
+map  <- readOGR(system.file("shapes/columbus.shp", package="spData")[1]) #shape file containing the polygons
+plot(map)
+
+
+nb_q <- poly2nb(map)                                   # Construct neighbours list from polygon list
+nb_W <- nb2listw(nb_q, style="B", zero.policy=TRUE)    # Spatial weights for neighbours lists
+W    <- as.matrix(as(nb_W, "sparseMatrix"))            # Adjacency matrix W
+W    <- diag(1/rowSums(W))%*%W                         # Row standardize adjacency matrix  
+eigenv    <- eigen(W)$values                           # Eigenvalues of W. We need them to compute the log-determinant of the precision matrix
+```
+
+We now implement the latent process $\mathbf{x}|\mathbf{y},\mathbf{V},\sigma_x,\rho \sim N(\mathbf{0}, \sigma_x^{-2} \mathbf{D}_{SAR}^{-1} \text{diag}(\mathbf{V})\mathbf{D}_{SAR}^{-T})$ in `rgeneric`. The precision matrix is $\mathbf{Q} = \tau_x \mathbf{D}_{SAR}^T \text{diag}(\mathbf{V})^{-1}\mathbf{D}_{SAR}$ and it is defined in the `Q` function. We consider a $\text{Unif}(0,1)$ prior on $\rho$ and a half-normal prior on $\tau_x$.
+
+```{r}
+'inla.rgeneric.sar.model' <- function(
+    cmd = c("graph", "Q", "mu", "initial", "log.norm.const",
+            "log.prior", "quit"),
+    theta = NULL) {
+  
+  envir = parent.env(environment())
+  
+  #Internal scale is log of precision and log of kappa
+  interpret.theta <- function() {
+    return(list(prec = exp(theta[1L]),
+                rho = exp(theta[2L])/(1+exp(theta[2L]))))
+  }
+  
+  
+  graph <- function(){
+    return(Q())
+  }
+  
+  Q <- function() { 
+    param = interpret.theta()
+    rho <- param$rho
+    prec  <- param$prec
+    
+    D = Diagonal(n,rep(1,n)) - rho*W
+    
+    return(prec*t(D)%*%Diagonal(n,1/V)%*%D)
+  }
+  
+  mu <- function()
+  {
+    return(numeric(0))
+  }
+  
+  log.norm.const <- function() {
+    
+    param = interpret.theta()
+    rho <- param$rho
+    prec  <- param$prec
+    
+    log.det.D <- sum(log(1-rho*eigenv))
+    
+    res <- -0.5*n*log(2*pi) + 0.5*n*log(prec) + log.det.D -0.5*sum(log(V))
+    return (res)  }
+  
+  
+
+  log.prior <- function() {
+    
+    param = interpret.theta()
+    rho <- param$rho
+    prec  <- param$prec
+    
+    tau_prec = 1/sqrt(5)  
+    
+    prior.theta1 <- log( (2*sqrt(tau_prec/(2*pi)))*exp(-0.5*tau_prec*prec^2) ) + theta[1L]
+    prior.theta2 <- log(exp(theta[2L])/(1+exp(theta[2L]))^2)
+    
+    res <-  prior.theta1 + prior.theta2
+    
+    return(res)
+  }
+  
+  
+  initial <- function() {
+    return(c(0,0))
+  }
+  
+  
+  quit <- function() {
+    return(invisible())
+  }
+  
+  if (!length(theta)) theta = initial()
+  res <- do.call(match.arg(cmd), args = list())
+  return(res)
+}
+```
+
+
+We now create a function that receives as input the mixing vector $\mathbf{V}$ and outputs the inla object. The input should be a list of numeric vectors, where each vector corresponds to each model component to extend to non-Gaussianity (in this example, there is just one model component). The argument `control.compute = list(config = TRUE)` in the `inla` function is required.
+
+```{r}
+inla.fit.V <- function(V){
+  
+  model = inla.rgeneric.define(inla.rgeneric.sar.model, n = N, V = V[[1]], W = W, eigenv = eigenv)
+
+  formula <- CRIME ~ 1 + HOVAL + INC  + f(s, model = model)
+
+  fit <- inla(formula, 
+              data = data,
+              control.compute = list(config = TRUE))
+  
+  return(fit)
+}
+```
+
+```{r}
+###Dfuncsel, h
+selection <- list(s=1:N)
+h         <- list(h=rep(1,N))
+
+func1    <- function(theta){
+  prec   <- exp(theta[2L]) 
+  rho    <- exp(theta[3L])/(1+exp(theta[3L]))
+  return(sqrt(prec)*(Diagonal(N,rep(1,N)) - rho*W))
+}
+Dfunc <- list(func1)
+
+inla.fit.V <- function(V,theta=NULL){
+  
+  model = inla.rgeneric.define(inla.rgeneric.sar.model, n=N[[1]], V=V[[1]], W = W, eigenv = eigenv)
+
+  formula <- CRIME ~ 1 + HOVAL + INC  + f(s, model = model)
+
+  control.mode = NULL
+  if(!is.null(theta)){
+    control.mode = list(theta = theta, fixed = TRUE)
+  }
+  
+  fit <- inla(formula, 
+               control.compute = list(config = TRUE, cpo = TRUE),
+               data = data, 
+               control.mode = control.mode)
+  
+  return(fit)
+}
+
+manual.configs <- list(h = h, Dfunc = Dfunc, inla.fit.V = inla.fit.V)
+
+```
+
+If $\mathbf{V}=\mathbf{1}$ then the latent field is Gaussian and `inla.fit.V` gives us the LGM.
+
+```{r, fig.height=5, fig.width=7}
+LGM <- inla.fit.V(list(rep(1,N)))
+
+LGM$summary.hyperpar
+LGM$mlik[2]
+
+#posterior marginals of the precision tau_x and  autocorrelation parameter rho
+plot(inla.tmarginal(function(x)  exp(x), LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "precision")
+plot(inla.tmarginal(function(x)  exp(x)/(1+exp(x)), LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "rho")
+```
+
+We now define the LnGM in `ngvb` using the `manual.configs` argument. `manual.configs` should be a list containing `inla.fit.V`. It should also include `Dfunc` which is a list containing the functions $\mathbf{D}_{SAR}(\boldsymbol{\theta})$ for each model component, that receive as input all hyperparameters $\boldsymbol{\theta}$ in internal scale, and outputs $\mathbf{D}_{SAR}(\boldsymbol{\theta})$. Finally, `manual.configs` also needs `h`, a list containing all predefined constant vectors (see @cabral2022controlling) for each model component.
+
+```{r}
+D1  <- function(theta){
+  prec   <- exp(theta[2L]) 
+  rho    <- exp(theta[3L])/(1+exp(theta[3L]))
+  return(sqrt(prec)*(Diagonal(N,rep(1,N)) - rho*W))
+}
+Dfunc <- list(D1)
+
+h         <- list(rep(1,N))
+
+manual.configs <- list(inla.fit.V = inla.fit.V, Dfunc = Dfunc, h = h)
+```
+
+We now call `ngvb`, and analyze the output.
+
+```{r, fig.height=5, fig.width=7}
+LnGM <- ngvb(manual.configs = manual.configs, selection = list(s=1:N), 
+             iter = 10, d.sampling = TRUE, n.sampling = 1000)
+```
+
+We can see in `plot(LnGM)` that more flexibility was added in 2 counties.
+
+```{r}
+plot(LnGM)
+LnGM@LGM$mlik[2]
+
+#posterior marginals of the precision tau_x and  autocorrelation parameter rho
+plot(inla.tmarginal(function(x)  exp(x), LnGM@LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "precision")
+plot(inla.tmarginal(function(x)  exp(x)/(1+exp(x)), LnGM@LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "rho")
+```
+
+
+
