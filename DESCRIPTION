@@ -21,7 +21,4 @@ Suggests:
     knitr,
     spdep,
     rgdal,
-    R.rsp
-VignetteBuilder:
-    R.rsp
-
+VignetteBuilder: knitr

@@ -4,7 +4,7 @@ output: rmarkdown::html_vignette
 bibliography: references.bib  
 vignette: >
   %\VignetteIndexEntry{ngvb}
-  %\VignetteEngine{R.rsp::asis}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
