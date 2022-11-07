@@ -13,6 +13,7 @@ eta.prior.f <- function(d,h,theta,N){
 }
 
 
+
 sampler.inverseCDF <- function(logpdf, supp.min, supp.max, supp.points = 100000, n.samples = 1){
 
   #Find mode of pdf

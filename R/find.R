@@ -129,7 +129,14 @@ find.inla.fit.V <- function(fit, N, model, term_string, ncomp, D.config){
 Dfuncsel <- function(model, N, D.config = NULL){
   hyperparsel = D.config$hyperparsel
   if(model == "rw1"){ #model with other boundary conditions not implemented
-    D     <- RW1.matrix(N)
+
+    D  <- bandSparse(N-1, N,
+                     (-1):1,
+                     list(rep(0, N-2),
+                          rep(-1,N-1),
+                          rep(1, N-1)),
+                     repr = "T")
+
     Dfunc <- function(theta){
       prec <- exp(theta[hyperparsel])
       return(sqrt(prec)*D)
@@ -137,7 +144,14 @@ Dfuncsel <- function(model, N, D.config = NULL){
   }
 
   else if(model == "rw2"){ # this is it in discrete case, for continuous case look at H paper
-    D     <- RW2.matrix(N)
+
+    D <- bandSparse(N-2, N,
+                    0:2,
+                    list(rep(1,  N-2),
+                         rep(-2, N-1),
+                         rep(1,  N-1)),
+                         repr = "T")
+
     Dfunc <- function(theta){
       prec <- exp(theta[hyperparsel])
       return(sqrt(prec)*D)

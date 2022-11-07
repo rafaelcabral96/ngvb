@@ -9,7 +9,7 @@ ngvb(
   manual.configs = NULL,
   selection,
   alpha.eta = rep(1, length(selection)),
-  n.sampling = 2500,
+  n.sampling = 1000,
   d.sampling = FALSE,
   method = "SCVI",
   fast = FALSE,
@@ -18,7 +18,7 @@ ngvb(
   V.init = NULL,
   eta.init = NULL,
   iter = 10,
-  stop.rel.change = 0.01
+  stop.rel.change = NULL
 )
 }
 \arguments{
@@ -44,7 +44,7 @@ ngvb(
 to non-Gaussianity. Same syntax as the argument \code{selection} of
 the function \code{inla.posterior.sample}.}
 
-\item{alpha.eta}{Numeric. Rate parameter of the exponential prior of the non-Gaussianity parameter \eqn{\alpha}
+\item{alpha.eta}{Numeric. Rate parameter of the exponential prior of the non-Gaussianity parameter \eqn{\alpha}.
 Should be a vector with the same dimension as the number of model components to extend.}
 
 \item{n.sampling}{Numeric. Number of samples uses in several sampling task throughout the algorithm.
@@ -91,9 +91,9 @@ An S4 object containing the outputs. Elements are accessed with @. The slots are
 Finds the posterior distribution of the hyperparameters \eqn{\theta}, latent field \eqn{x},
 mixing variables \eqn{V} and non-Gaussianity parameters \eqn{\alpha} of latent non-Gaussian models (LnGMs)
 using INLA and variational Bayes approximations. These LnGMs are flexible extensions
-of latent Gaussian models (LGMs), see ??. The LnGMs are specified either through
+of latent Gaussian models (LGMs). The LnGMs are specified either through
 an INLA object (\code{fit}) that fits an LGM or through a list of configurations (\code{manual.configs}).
-See example ?? on how to use both.
+Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several use cases.
 }
 \examples{
  \dontrun{
@@ -101,16 +101,16 @@ See example ?? on how to use both.
  plot(jumpts)
 
  #Set priors on the hyperparameters
- prec.prior <- list(prec = list(prior = "loggamma", param = c(1, 0.1)))
- prior.list <- list(theta1 = list(prior = "pc.prec", param = c(3,0.1)),
-                    theta2 = list(prior = "pc.cor0", param = c(0.5,0.5)))
+ prior.response <- list(prec = list(prior = "loggamma", param = c(1, 0.1)))
+ prior.ar1      <- list(theta1 = list(prior = "pc.prec", param = c(3,0.1)),
+                        theta2 = list(prior = "pc.cor0", param = c(0.5,0.5)))
 
 
  #Fit LGM with INLA
- formula <- y ~ -1 + f(x,  model = "ar1", hyper = prior.list)
+ formula <- y ~ -1 + f(x,  model = "ar1", hyper = prior.ar1)
  LGM     <- inla(formula,
                  data = jumpts,
-                 control.family = list(hyper = prec.prior))
+                 control.family = list(hyper = prior.response))
 
  #Fit LnGM with ngvb
  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))

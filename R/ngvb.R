@@ -3,9 +3,9 @@
 #' @description Finds the posterior distribution of the hyperparameters \eqn{\theta}, latent field \eqn{x},
 #' mixing variables \eqn{V} and non-Gaussianity parameters \eqn{\alpha} of latent non-Gaussian models (LnGMs)
 #' using INLA and variational Bayes approximations. These LnGMs are flexible extensions
-#' of latent Gaussian models (LGMs), see ??. The LnGMs are specified either through
+#' of latent Gaussian models (LGMs). The LnGMs are specified either through
 #' an INLA object (\code{fit}) that fits an LGM or through a list of configurations (\code{manual.configs}).
-#' See example ?? on how to use both.
+#' Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several use cases.
 #'
 #' @param fit The inla object that fits the LGM.
 #' @param manual.configs Not necessary if \code{fit} is provided. List containing:
@@ -26,10 +26,9 @@
 #' @param selection List which specifies which model components of the LGM are to be extended
 #' to non-Gaussianity. Same syntax as the argument \code{selection} of
 #' the function \code{inla.posterior.sample}.
-#' @param alpha.eta Numeric. Rate parameter of the exponential prior of the non-Gaussianity parameter \eqn{\alpha}
+#' @param alpha.eta Numeric. Rate parameter of the exponential prior of the non-Gaussianity parameter \eqn{\alpha}.
 #' Should be a vector with the same dimension as the number of model components to extend.
-#' @param n.sampling Numeric. Number of samples uses in several sampling task throughout the algorithm.
-#' Check Algorithms 1 and 2 of ??.
+#' @param n.sampling Numeric. Number of samples uses in several sampling task throughout the SVI or SCVI algorithm.
 #' @param d.sampling Logical. If \code{TRUE} computes the expectation \eqn{d = E[Dx]}
 #' by sampling (slower). If \code{FALSE} (default) uses the mixture Gaussian approximation
 #' of \eqn{x} obtained in INLA.
@@ -62,16 +61,16 @@
 #'  plot(jumpts)
 #'
 #'  #Set priors on the hyperparameters
-#'  prec.prior <- list(prec = list(prior = "loggamma", param = c(1, 0.1)))
-#'  prior.list <- list(theta1 = list(prior = "pc.prec", param = c(3,0.1)),
-#'                     theta2 = list(prior = "pc.cor0", param = c(0.5,0.5)))
+#'  prior.response <- list(prec = list(prior = "loggamma", param = c(1, 0.1)))
+#'  prior.ar1      <- list(theta1 = list(prior = "pc.prec", param = c(3,0.1)),
+#'                         theta2 = list(prior = "pc.cor0", param = c(0.5,0.5)))
 #'
 #'
 #'  #Fit LGM with INLA
-#'  formula <- y ~ -1 + f(x,  model = "ar1", hyper = prior.list)
+#'  formula <- y ~ -1 + f(x,  model = "ar1", hyper = prior.ar1)
 #'  LGM     <- inla(formula,
 #'                  data = jumpts,
-#'                  control.family = list(hyper = prec.prior))
+#'                  control.family = list(hyper = prior.response))
 #'
 #'  #Fit LnGM with ngvb
 #'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
@@ -87,17 +86,20 @@
 #'
 ngvb <- function(fit = NULL, manual.configs = NULL,
                  selection, alpha.eta = rep(1,length(selection)),
-                 n.sampling = 2500, d.sampling = FALSE,
+                 n.sampling = 1000, d.sampling = FALSE,
                  method = "SCVI", fast = FALSE,
                  verbose = TRUE, history = FALSE,
                  V.init = NULL, eta.init = NULL,
-                 iter = 10, stop.rel.change = 0.01){
+                 iter = 10, stop.rel.change = NULL){
 
-  if(method == "SVI") stop.rel.change = 0.001
 
   start_time <- Sys.time()
-  fit        <- change.args.controls(fit, fast)
   fits       <- ngvb.list()
+
+  if(is.null(stop.rel.change)){
+    if(method == "SCVI") stop.rel.change = 0.01
+    if(method == "SVI") stop.rel.change = 0.001
+  }
 
   ##-------------------------------------
   ##    HOW MANY COMPONENTS TO ROBUSTIFY?
@@ -108,6 +110,8 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
   ##    Getting Dfunc, h, and, inla.fit.V from fit object
   ##-----------------------------------------------------
   if(is.null(manual.configs)){
+    fit                   <- change.args.controls(fit, fast)
+
     models                <- c("iid","rw1", "rw2", "ar1")
 
     ##-------------------------------------
@@ -212,94 +216,145 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
     ##-------------------------------
     ##     Compute relevant statistic
     ##-------------------------------
-
-
-    if(d.sampling){d <- suppressWarnings(compute.d.sampling(fit, D.config)) }
-    else{          d <- compute.d.configs(fit, D.config) }
-
-    post.eta       <- list()
-    post.V         <- list()
-    SCVI.samples   <- list() #save V matrices for each component
-    eta.samples    <- list()
-
-    for(k in 1:ncomp){
-
-      dk     <- d[[k]]
-      alpha.etak <- alpha.eta[k]
-      hk     <- h[[k]]
-      etak   <- eta[k]
-      Nk     <- N[[k]]
-
-
-      if(method == "SVI"){
-
-        ##-------------------------------
-        ##     SVI distribution for V's
-        ##-------------------------------
-        #Read relevant moments from previous iteration first
-        if(i>2){
-          #Eetam1 <-  fits[[i-1]]$ngvb$post.eta[[k]]$Eetam1
-        } else{
-          Eetam1 <- 1/etak
-        }
-        p_V <- -1
-        a_V <- Eetam1
-        b_V <- dk + hk^2*Eetam1
-
-        ##-------------------------------
-        ##     SVI distribution for eta
-        ##-------------------------------
-        #Get relevant moments from current iteration
-        EV   <-  GIGM1(p = p_V, a = a_V, b = b_V)
-        EVm1 <-  GIGMm1(p = p_V, a = a_V, b = b_V)
-        p_eta <- -length(hk)/2+1
-        a_eta <- 2*alpha.etak
-        b_eta <- sum(EV-2*hk+hk^2*EVm1)
-
-        ##-----------------------------------------
-        ##  Save parameters and relevant moments
-        ##-----------------------------------------
-        Eeta   <- mGIG(p_eta, a_eta, b_eta, order = 1)   #save gets samples and computes mean by monte carlo
-        Eetam1 <- mGIG(p_eta, a_eta, b_eta, order = -1)  #save gets samples and computes mean by monte carlo
-
-        ##----------------------------------------
-        ##  Estimate of V to be used in INLA fit
-        ##-----------------------------------------
-        V[[k]]     <- 1/EVm1
-        eta[k]     <- Eeta
-
-
-        ##----------------------------------------
-        ##
-        ##----------------------------------------
-        post.eta[[k]] <- list(p_eta = p_eta, a_eta = a_eta, b_eta = b_eta, Eeta = Eeta, Eetam1 = Eetam1)
-        post.V[[k]]   <- list(p_V = p_V, a_V = a_V, b_V = b_V, EV = EV, EVm1 = EVm1)
-
-      }
-
-      else if(method == "SCVI"){
-
-        ##----------------------------------------
-        ##  Estimate of V to be used in INLA fit
-        ##-----------------------------------------
-        eta.prior <- eta.prior.f(dk,hk,alpha.etak,Nk)
-        eta.sample <- sampler.inverseCDF(eta.prior, supp.min = 0, supp.max = 1000, supp.points = 10000, n.samples = n.sampling)
-
-        ntotal <- n.sampling*length(hk)
-        p      <- rep(-1,ntotal)
-        a      <- rep(1/eta.sample, each=length(hk))
-        b      <- c(t(outer(eta.sample, hk, FUN = function(x,y) y^2/x))) + rep(dk,length(eta.sample))
-        Vm     <- matrix(1/ngme::rGIG(p,a,b), nrow = n.sampling, ncol = length(hk), byrow = TRUE)
-        EVm1   <- colMeans(Vm)
-
-        V[[k]]       <- unname(1/EVm1)
-        eta[k]       <- mean(eta.sample)
-
-        SCVI.samples[[k]]  <- 1/Vm
-        eta.samples[[k]] <- eta.sample
-      }
-      else{stop("Method not implemented")}
+    if(method == "SVI" || method == "SCVI"){
+      if(d.sampling){d <- suppressWarnings(compute.d.sampling(fit, D.config)) }
+      else{          d <- compute.d.configs(fit, D.config) }
     }
+
+
+    if (method == "Gibbs"){
+
+      samples <- inla.posterior.sample(n = 1, fit, selection = selection,
+                                       intern = TRUE, use.improved.mean = TRUE, skew.corr = TRUE,
+                                       add.names = TRUE, seed = 0L, num.threads = 0,
+                                       verbose = FALSE)
+
+      lenghts <- unlist(lapply(selection,length))
+      start = 1
+      end = lenghts[1]
+      d <- list()
+      for(k in 1:ncomp){
+
+        alpha.etak <- alpha.eta[k]
+        hk     <- h[[k]]
+        etak   <- eta[k]
+        Nk     <- N[[k]]
+
+        Vk <- numeric(lenghts[k])
+
+        x        = c(samples[[1]]$latent)[start:end]
+        hyperpar = samples[[1]]$hyperpar
+        Dx       = (D.config[[k]]$Dfunc(hyperpar)%*%x)[,1]
+
+        d[[k]] <- Dx
+
+        for(j in 1:length(hk)){
+          #Vk[j] <- ngme::rGIG(p = -1, a = 1/etak, b = hk[j]^2/etak + Dx[j]^2 )
+          Vk[j] <- GIGrvg::rgig(n = 1,
+                                lambda = -1,
+                                psi = 1/eta[k],
+                                chi = hk[j]^2/eta[k] + Dx[j]^2)
+        }
+
+        V[[k]]       <- Vk
+        eta[k]       <- GIGrvg::rgig(n = 1,
+                                     lambda = -N[[k]]/2+1,
+                                     psi = 2*alpha.etak,
+                                     chi = sum((Vk-hk)^2/Vk))
+
+        #eta[k]       <- ngme::rGIG( p= -N[[k]]/2+1, a = 2*alpha.etak, b = sum((Vk-hk)^2/Vk))
+
+        start = start + lenghts[k]
+        end   = end + lenghts[k+1]
+      }
+    }
+    else{
+
+      post.eta       <- list()
+      post.V         <- list()
+      SCVI.samples   <- list() #save V matrices for each component
+      eta.samples    <- list()
+
+      for(k in 1:ncomp){
+
+        dk     <- d[[k]]
+        alpha.etak <- alpha.eta[k]
+        hk     <- h[[k]]
+        etak   <- eta[k]
+        Nk     <- N[[k]]
+
+        if(method == "SVI"){
+
+          ##-------------------------------
+          ##     SVI distribution for V's
+          ##-------------------------------
+          #Read relevant moments from previous iteration first
+          if(i>2){
+            #Eetam1 <-  fits[[i-1]]$ngvb$post.eta[[k]]$Eetam1
+          } else{
+            Eetam1 <- 1/etak
+          }
+          p_V <- -1
+          a_V <- Eetam1
+          b_V <- dk + hk^2*Eetam1
+
+          ##-------------------------------
+          ##     SVI distribution for eta
+          ##-------------------------------
+          #Get relevant moments from current iteration
+          EV   <-  GIGM1(p = p_V, a = a_V, b = b_V)
+          EVm1 <-  GIGMm1(p = p_V, a = a_V, b = b_V)
+          p_eta <- -length(hk)/2+1
+          a_eta <- 2*alpha.etak
+          b_eta <- sum(EV-2*hk+hk^2*EVm1)
+
+          ##-----------------------------------------
+          ##  Save parameters and relevant moments
+          ##-----------------------------------------
+          Eeta   <- mGIG(p_eta, a_eta, b_eta, order = 1)   #save gets samples and computes mean by monte carlo
+          Eetam1 <- mGIG(p_eta, a_eta, b_eta, order = -1)  #save gets samples and computes mean by monte carlo
+
+          ##----------------------------------------
+          ##  Estimate of V to be used in INLA fit
+          ##-----------------------------------------
+          V[[k]]     <- 1/EVm1
+          eta[k]     <- Eeta
+
+
+          ##----------------------------------------
+          ##
+          ##----------------------------------------
+          post.eta[[k]] <- list(p_eta = p_eta, a_eta = a_eta, b_eta = b_eta, Eeta = Eeta, Eetam1 = Eetam1)
+          post.V[[k]]   <- list(p_V = p_V, a_V = a_V, b_V = b_V, EV = EV, EVm1 = EVm1)
+
+        }
+
+        else if(method == "SCVI"){
+
+          ##----------------------------------------
+          ##  Estimate of V to be used in INLA fit
+          ##-----------------------------------------
+          eta.prior <- eta.prior.f(dk,hk,alpha.etak,Nk)
+          eta.sample <- sampler.inverseCDF(eta.prior, supp.min = 0, supp.max = 1000, supp.points = 10000, n.samples = n.sampling)
+
+          ntotal <- n.sampling*length(hk)
+          p      <- rep(-1,ntotal)
+          a      <- rep(1/eta.sample, each=length(hk))
+          b      <- c(t(outer(eta.sample, hk, FUN = function(x,y) y^2/x))) + rep(dk,length(eta.sample))
+          Vm     <- matrix(1/ngme::rGIG(p,a,b), nrow = n.sampling, ncol = length(hk), byrow = TRUE)
+          EVm1   <- colMeans(Vm)
+
+          V[[k]]       <- unname(1/EVm1)
+          eta[k]       <- mean(eta.sample)
+
+          SCVI.samples[[k]]  <- 1/Vm
+          eta.samples[[k]] <- eta.sample
+        }
+        else{stop("Method not implemented")}
+      }
+
+    }
+
 
     ##----------------------------------------
     ##  INLA FIT
@@ -344,14 +399,12 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
       }
     }
 
-    #check if Vs change a lot
+
     if( (method == "SCVI") || (method == "SVI") ){
       if(max(rate.change) < stop.rel.change){
         cat(paste("\n 0Oo----------- Convergence achieved -----------oO0\n", sep = ""))
         break}
     }
-
-
     if(i == iter){
       cat(paste("\n 0Oo----------- Maximum number of iterations reached -----------oO0\n", sep = ""))
     }

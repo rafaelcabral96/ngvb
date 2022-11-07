@@ -6,6 +6,7 @@ ngvb.summary.mixing <- function(fit, configs){
   h         <- configs$h
 
   if(method == "Gibbs"){
+    V       <- fit$ngvb$V
     summary <-  data.frame(component = rep(compnames, lengths(V)),
                            index = unlist(lapply(lengths(V), function(x) 1:x)),
                            V = unlist(V))

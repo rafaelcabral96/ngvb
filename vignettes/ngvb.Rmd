@@ -4,7 +4,7 @@ output: rmarkdown::html_vignette
 bibliography: references.bib  
 vignette: >
   %\VignetteIndexEntry{ngvb}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{R.rsp::asis}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -149,10 +149,11 @@ LnGM@LGM$mlik[2]
 Here we demonstrate how to fit LnGM models currently unavailable in `ngvb` or `inla` using the rgeneric functionality of `inla` and the `manual.configs` argument of `ngvb`.
 
 We study here areal data, which consists of the number of residential burglaries and vehicle thefts per thousand households ($y_i$) in 49 counties of Columbus, Ohio, in 1980. This dataset can be found in the `spdep` package. We consider the following model:
-\begin{equation} 
+
+$$
 y_{i}= \beta_0 + \beta_1 \mathrm{HV}_i + \beta_2 \mathrm{HI}_i +  \sigma_{\mathbf{x}}x_i + \sigma_{\epsilon}\epsilon_i,  
-(\#eq:columbus)
-\end{equation} 
+$$
+
 where $\mathrm{HV}_i$ and $\mathrm{HI}_i$ are the average household value and household income for county $i$, and $\mathbf{x}$ accounts for structured spatial effects, while $\epsilon_i \overset{i.i.d}{\sim} N(0,1)$ is an unstructured spatial effect. 
 
 
@@ -162,10 +163,15 @@ Gaussian SAR models are not implemented in INLA, so we have to use the `rgeneric
 
 
 ```{r message=FALSE, warning=FALSE, fig.height=5, fig.width=7}
-#install.packages("spdep")
-#install.packages("rgdal")
-library(spdep)                # Columbus dataset
-library(rgdal)                # Read polygon data
+# Required package names
+packages <- c("spdep", "rgdal") 
+
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {  install.packages(packages[!installed_packages]) }
+
+# Packages loading
+invisible(lapply(packages, library, character.only = TRUE))
 
 data(columbus)
 data    <- columbus[,c("CRIME","HOVAL","INC")]       # data
@@ -281,41 +287,6 @@ inla.fit.V <- function(V){
 }
 ```
 
-```{r}
-###Dfuncsel, h
-selection <- list(s=1:N)
-h         <- list(h=rep(1,N))
-
-func1    <- function(theta){
-  prec   <- exp(theta[2L]) 
-  rho    <- exp(theta[3L])/(1+exp(theta[3L]))
-  return(sqrt(prec)*(Diagonal(N,rep(1,N)) - rho*W))
-}
-Dfunc <- list(func1)
-
-inla.fit.V <- function(V,theta=NULL){
-  
-  model = inla.rgeneric.define(inla.rgeneric.sar.model, n=N[[1]], V=V[[1]], W = W, eigenv = eigenv)
-
-  formula <- CRIME ~ 1 + HOVAL + INC  + f(s, model = model)
-
-  control.mode = NULL
-  if(!is.null(theta)){
-    control.mode = list(theta = theta, fixed = TRUE)
-  }
-  
-  fit <- inla(formula, 
-               control.compute = list(config = TRUE, cpo = TRUE),
-               data = data, 
-               control.mode = control.mode)
-  
-  return(fit)
-}
-
-manual.configs <- list(h = h, Dfunc = Dfunc, inla.fit.V = inla.fit.V)
-
-```
-
 If $\mathbf{V}=\mathbf{1}$ then the latent field is Gaussian and `inla.fit.V` gives us the LGM.
 
 ```{r, fig.height=5, fig.width=7}
@@ -353,7 +324,7 @@ LnGM <- ngvb(manual.configs = manual.configs, selection = list(s=1:N),
 
 We can see in `plot(LnGM)` that more flexibility was added in 2 counties.
 
-```{r}
+```{r, fig.height=5, fig.width=7}
 plot(LnGM)
 LnGM@LGM$mlik[2]
 

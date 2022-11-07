@@ -2,6 +2,8 @@
 
 export(ngvb)
 exportMethods(fitted)
+exportMethods(mungeGibbs.mixing)
+exportMethods(mungeGibbs.ng)
 exportMethods(plot)
 exportMethods(print)
 exportMethods(simulate)

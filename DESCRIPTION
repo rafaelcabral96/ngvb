@@ -5,8 +5,7 @@ Version: 0.1.0
 Author: Rafael Cabral
 Maintainer: Rafael Cabral <rafael.medeiros.cabral@gmail.com>
 Description: This package performs inference of models whose latent field is non-Gaussian using
-    variational bayes and Laplace approximations. Currently, only latent RW1, RW2, i.i.d., and AR1
-    models driven by NIG noise are implemented. 
+    variational bayes and Laplace approximations (INLA).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,10 +15,13 @@ Imports:
     foreach
 Depends:
     INLA,
-    Matrix
+    GIGrvg
 Suggests: 
     rmarkdown,
     knitr,
     spdep,
-    rgdal
-VignetteBuilder: knitr
+    rgdal,
+    R.rsp
+VignetteBuilder:
+    R.rsp
+

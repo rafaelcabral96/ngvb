@@ -57,7 +57,6 @@ setMethod("addconfigs", signature("ngvb.list","list"),
 #' @param ... Extra arguments to be used in \code{plot(x@LGM, ...)} where \code{x@LGM} is an inla object.
 #' @export
 #' @rdname plot
-#' @method plot ngvb
 setMethod("plot",
           c(x="ngvb.list", y="missing"),
           function(x, y, ...){
@@ -313,4 +312,73 @@ setMethod(f = "simulate", "ngvb.list",
             return(list(hyperpar = hyper.sample, LGM = LGM.sample, V = V.sample, ng = eta.sample))
 
 
+          })
+
+
+
+setGeneric("mungeGibbs.mixing",
+           function(object) StandardGeneric("mungeGibbs.mixing"))
+
+#' Process \code{ngvb.list} when \code{method = "Gibbs"}. Produce a matrix with the
+#' samples of the mixing variables \eqn{\mathbf{V}}.
+#'
+#' @param object An ngvb.list object (output of \code{ngvb} function)
+#' @export
+#' @rdname mungeGibbs.mixing
+setMethod("mungeGibbs.mixing", "ngvb.list",
+          function(object){
+
+            names <- names(object@configs$selection)
+            n     <- length(object@history)
+            ncomp <- object@configs$ncomp
+            N     <- object@configs$N
+
+            Vlist <- list()
+            for(k in 1:ncomp){
+              Vmatrix <- matrix(NA, nrow = n+1, ncol = N[k])
+              for(i in 1:n){
+                sum <- object@history[[i]]$summary.mixing
+                V <- sum[sum$component == names[k],"V"]
+                Vmatrix[i,] <-  V
+              }
+              sum <- object@summary.mixing
+              V <- sum[sum$component == names[k], "V"]
+              Vmatrix[i+1,] <-  V
+
+              Vlist[[k]] <- Vmatrix
+            }
+            names(Vlist) <- names
+
+            return(Vlist)
+          })
+
+setGeneric("mungeGibbs.ng",
+           function(object) StandardGeneric("mungeGibbs.ng"))
+
+#' Process \code{ngvb.list} when \code{method = "Gibbs"}. Produce a matrix with the
+#' samples of the non-Gaussianity parameter \eqn{\eta}.
+#'
+#' @param object An ngvb.list object (output of \code{ngvb} function)
+#' @export
+#' @rdname mungeGibbs.ng
+setMethod("mungeGibbs.ng", "ngvb.list",
+          function(object){
+
+            names <- names(object@configs$selection)
+            n     <- length(object@history)
+            ncomp <- object@configs$ncomp
+            N     <- object@configs$N
+
+            nglist <- list()
+            for(k in 1:ncomp){
+              ng <- c()
+              for(i in 1:n){
+                eta <- object@history[[i]]$summary.ng[k,1]
+                ng <- c(ng,eta)
+              }
+              ng <- c(ng, object@summary.ng[k,1])
+              nglist[[k]] <- ng
+            }
+            names(nglist) <- names
+            return(nglist)
           })
