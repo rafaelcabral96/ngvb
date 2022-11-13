@@ -2,7 +2,7 @@
 % Please edit documentation in R/ngvb.list.R
 \name{mungeGibbs.ng,ngvb.list-method}
 \alias{mungeGibbs.ng,ngvb.list-method}
-\title{Process \code{ngvb.list} when \code{method = "Gibbs"}. Produce a matrix with the
+\title{Process \code{ngvb.list} when \code{method = "Gibbs"}. Produces a matrix with the
 samples of the non-Gaussianity parameter \eqn{\eta}.}
 \usage{
 \S4method{mungeGibbs.ng}{ngvb.list}(object)
@@ -11,6 +11,21 @@ samples of the non-Gaussianity parameter \eqn{\eta}.}
 \item{object}{An ngvb.list object (output of \code{ngvb} function)}
 }
 \description{
-Process \code{ngvb.list} when \code{method = "Gibbs"}. Produce a matrix with the
+Process \code{ngvb.list} when \code{method = "Gibbs"}. Produces a matrix with the
 samples of the non-Gaussianity parameter \eqn{\eta}.
+}
+\examples{
+ #Here we fit an RW1 latent process to the jumpts time series
+ plot(jumpts)
+
+ #Fit LGM with INLA
+ LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+                 data = jumpts)
+
+ #Run 10 iterations from the Gibbs sampler
+ LnGM.Gibbs <- ngvb(fit = LGM, selection = list(x=1:100),
+                    method = "Gibbs", iter=10)
+
+ Gibbs.V    <- mungeGibbs.mixing(LnGM.Gibbs)
+ Gibbs.eta  <- mungeGibbs.ng(LnGM.Gibbs)
 }

@@ -13,10 +13,10 @@ This class stores the output of the ngvb function.
 \describe{
 \item{\code{history}}{List containing summaries of the model at each iteration.}
 
-\item{\code{LGM}}{inla object containing summaries and marginals of the latent field \eqn{x}
-and hyperparameters \eqn{\theta} of the last iteration.}
+\item{\code{LGM}}{inla object containing summaries and marginals of the latent field \eqn{\mathbf{x}}
+and hyperparameters \eqn{\boldsymbol{\theta}} of the last iteration.}
 
-\item{\code{summary.mixing}}{Data frame containing summaries of the mixing variables \eqn{V} (last iteration).}
+\item{\code{summary.mixing}}{Data frame containing summaries of the mixing variables \eqn{\mathbf{V}} (last iteration).}
 
 \item{\code{summary.ng}}{Data frame containing summaries of the non-Gaussianiy parameters \eqn{\eta} (last iteration).}
 

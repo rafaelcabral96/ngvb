@@ -1,9 +1,9 @@
 #' This class stores the output of the ngvb function.
 #'
 #' @slot history List containing summaries of the model at each iteration.
-#' @slot LGM  inla object containing summaries and marginals of the latent field \eqn{x}
-#'    and hyperparameters \eqn{\theta} of the last iteration.
-#' @slot summary.mixing  Data frame containing summaries of the mixing variables \eqn{V} (last iteration).
+#' @slot LGM  inla object containing summaries and marginals of the latent field \eqn{\mathbf{x}}
+#'    and hyperparameters \eqn{\boldsymbol{\theta}} of the last iteration.
+#' @slot summary.mixing  Data frame containing summaries of the mixing variables \eqn{\mathbf{V}} (last iteration).
 #' @slot summary.ng Data frame containing summaries of the non-Gaussianiy parameters \eqn{\eta} (last iteration).
 #' @slot configs List containing the LnGM model specifications.
 ngvb.list <- setClass("ngvb.list",
@@ -49,12 +49,30 @@ setMethod("addconfigs", signature("ngvb.list","list"),
           }
 )
 
+setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
 
 #' Plots several summaries of an \code{ngvb.list} object.
 #'
 #' @param x An ngvb.list object (output of \code{ngvb} function)
 #' @param y Not used.
 #' @param ... Extra arguments to be used in \code{plot(x@LGM, ...)} where \code{x@LGM} is an inla object.
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Fit LnGM with ngvb
+#'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+#'
+#'  #Available methods
+#'  summary(LnGM)
+#'  print(LnGM)
+#'  plot(LnGM)
+#'  fitted(LnGM)
+#'  samples <- simulate(LnGM)
 #' @export
 #' @rdname plot
 setMethod("plot",
@@ -87,6 +105,23 @@ setMethod("plot",
 #' Produces summaries of the \code{ngvb.list} object.
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Fit LnGM with ngvb
+#'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+#'
+#'  #Available methods
+#'  summary(LnGM)
+#'  print(LnGM)
+#'  plot(LnGM)
+#'  fitted(LnGM)
+#'  samples <- simulate(LnGM)
 #' @export
 #' @rdname summary
 setMethod("summary", "ngvb.list",
@@ -106,6 +141,23 @@ setMethod("summary", "ngvb.list",
 #' Prints outputs of the \code{ngvb.list} object.
 #'
 #' @param x An ngvb.list object (output of \code{ngvb} function)
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Fit LnGM with ngvb
+#'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+#'
+#'  #Available methods
+#'  summary(LnGM)
+#'  print(LnGM)
+#'  plot(LnGM)
+#'  fitted(LnGM)
+#'  samples <- simulate(LnGM)
 #' @export
 #' @rdname print
 setMethod(f = "print", "ngvb.list",
@@ -120,6 +172,23 @@ setMethod(f = "print", "ngvb.list",
 #' if \code{compute=TRUE} in \code{control.predictor} of the inla object \code{fit}.
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Fit LnGM with ngvb
+#'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+#'
+#'  #Available methods
+#'  summary(LnGM)
+#'  print(LnGM)
+#'  plot(LnGM)
+#'  fitted(LnGM)
+#'  samples <- simulate(LnGM)
 #' @export
 #' @rdname fitted
 setMethod(f = "fitted", "ngvb.list",
@@ -135,17 +204,35 @@ setMethod(f = "fitted", "ngvb.list",
 #' @param object An ngvb.list object (output of \code{ngvb} function).
 #' @param n.sampling Integer. Number of samples.
 #' @param components Vector containing \code{c("LGM","V","ng","hyperpar")}.
-#' If \code{components} contains \code{"LGM"} then it generates samples of \eqn{(x,\theta)} using
+#' If \code{components} contains \code{"LGM"} then it generates samples of \eqn{(\mathbf{x},\boldsymbol{\theta})} using
 #' \code{inla.posterior.sample}. If it contains \code{"hyperpar"} then generate samples of
-#' \eqn{\theta} using \code{inla.hypearpar.sample}. It it contains \code{"V"} or \code{"ng"} then
-#' generate samples from the mixing variables \eqn{V} and \eqn{\eta} for each model component,
+#' \eqn{\boldsymbol{\theta}} using \code{inla.hypearpar.sample}. It it contains \code{"V"} or \code{"ng"} then
+#' generate samples from the mixing variables \eqn{\mathbf{V}} and \eqn{\eta} for each model component,
 #' respectively.
 #' @param long.tailed Logical. If \code{TRUE} generate long-tailed samples of the the latent field
-#' \eqn{x}. It first generates samples of \eqn{(V,\theta)} and then it generates samples of  \eqn{x|V,\theta,y}
+#' \eqn{\mathbf{x}}. It first generates samples of \eqn{(\mathbf{V},\boldsymbol{\theta})} and then
+#' it generates samples of  \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta}, \mathbf{y}}
 #' (which is an LGM) by fitting an INLA model each time and generating n = \code{augmentation} samples.
 #'  Slow. Reduce \code{n.sampling} for speed and increase \code{augmentation} to obtain more samples.
-#' @param augmentation Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(V,\theta)} generate
-#' n = \code{augmentation} samples of \eqn{x|V,\theta,y}.
+#' @param augmentation Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
+#' n = \code{augmentation} samples of \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta} , \mathbf{y}}.
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Fit LnGM with ngvb
+#'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+#'
+#'  #Available methods
+#'  summary(LnGM)
+#'  print(LnGM)
+#'  plot(LnGM)
+#'  fitted(LnGM)
+#'  samples <- simulate(LnGM)
 #' @export
 #' @rdname simulate
 setMethod(f = "simulate", "ngvb.list",
@@ -319,10 +406,24 @@ setMethod(f = "simulate", "ngvb.list",
 setGeneric("mungeGibbs.mixing",
            function(object) StandardGeneric("mungeGibbs.mixing"))
 
-#' Process \code{ngvb.list} when \code{method = "Gibbs"}. Produce a matrix with the
+#' Process \code{ngvb.list} when \code{method = "Gibbs"}. Produces a matrix with the
 #' samples of the mixing variables \eqn{\mathbf{V}}.
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Run 10 iterations from the Gibbs sampler
+#'  LnGM.Gibbs <- ngvb(fit = LGM, selection = list(x=1:100),
+#'                     method = "Gibbs", iter=10)
+#'
+#'  Gibbs.V    <- mungeGibbs.mixing(LnGM.Gibbs)
+#'  Gibbs.eta  <- mungeGibbs.ng(LnGM.Gibbs)
 #' @export
 #' @rdname mungeGibbs.mixing
 setMethod("mungeGibbs.mixing", "ngvb.list",
@@ -355,10 +456,24 @@ setMethod("mungeGibbs.mixing", "ngvb.list",
 setGeneric("mungeGibbs.ng",
            function(object) StandardGeneric("mungeGibbs.ng"))
 
-#' Process \code{ngvb.list} when \code{method = "Gibbs"}. Produce a matrix with the
+#' Process \code{ngvb.list} when \code{method = "Gibbs"}. Produces a matrix with the
 #' samples of the non-Gaussianity parameter \eqn{\eta}.
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
+#' @examples
+#'  #Here we fit an RW1 latent process to the jumpts time series
+#'  plot(jumpts)
+#'
+#'  #Fit LGM with INLA
+#'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+#'                  data = jumpts)
+#'
+#'  #Run 10 iterations from the Gibbs sampler
+#'  LnGM.Gibbs <- ngvb(fit = LGM, selection = list(x=1:100),
+#'                     method = "Gibbs", iter=10)
+#'
+#'  Gibbs.V    <- mungeGibbs.mixing(LnGM.Gibbs)
+#'  Gibbs.eta  <- mungeGibbs.ng(LnGM.Gibbs)
 #' @export
 #' @rdname mungeGibbs.ng
 setMethod("mungeGibbs.ng", "ngvb.list",

@@ -26,18 +26,18 @@ ngvb(
 
 \item{manual.configs}{Not necessary if \code{fit} is provided. List containing:
 \itemize{
-   \item \code{inla.fit.V} Function that receives as input the mixing variables \eqn{{V}} and
-   the output is an inla object that fits the LGM \eqn{(x,\theta|V,y)}.
-   \item \code{Dfunc} Function that receives as input the hyperparameter vector \eqn{\theta}
-    in internal scale and the output is \eqn{D(\theta)}, where \eqn{D} is the dependency matrix that
+   \item \code{inla.fit.V} Function that receives as input the mixing variables \eqn{\mathbf{V}} and
+   the output is an inla object that fits the LGM \eqn{(\mathbf{x},\boldsymbol{\theta} | \mathbf{V}, \mathbf{y})}.
+   \item \code{Dfunc} Function that receives as input the hyperparameter vector \eqn{\boldsymbol{\theta}}
+    in internal scale and the output is \eqn{\mathbf{D}(\boldsymbol{\theta})}, where \eqn{\mathbf{D}} is the dependency matrix that
     specifies the non-Gaussian latent field. If there is more than one latent component
-    to be extended to non-Gaussianity, this should be a list of functions \eqn{D_i(\theta)},
-    where \eqn{D_i(\theta)} is the dependency matrix that specifies component i.
-   \item \code{h} Predefined constant vector that contains the distance between locations
-   or area of the basis functions. For models defined in discrete space this should be a
-   vector of ones. If there is more than one latent component
-    to be extended to non-Gaussianity, this should be a list of vectors h_i
-    where h_i is the predefined constant vector of component i.
+    to be extended to non-Gaussianity, this should be a list of functions \eqn{\mathbf{D}_i(\boldsymbol{\theta})},
+    where \eqn{\mathbf{D}_i(\boldsymbol{\theta})} is the dependency matrix that specifies component i.
+    \item \code{h} Predefined constant \eqn{\mathbf{h}} vector that contains the distance between locations
+    or area of the basis functions. For models defined in discrete space this should be a
+    vector of ones. If there is more than one latent component to be extended to non-Gaussianity,
+    this should be a list of vectors \eqn{\mathbf{h_i}}
+    where \eqn{\mathbf{h_i}} is the predefined constant vector of component i.
  }}
 
 \item{selection}{List which specifies which model components of the LGM are to be extended
@@ -47,27 +47,26 @@ the function \code{inla.posterior.sample}.}
 \item{alpha.eta}{Numeric. Rate parameter of the exponential prior of the non-Gaussianity parameter \eqn{\alpha}.
 Should be a vector with the same dimension as the number of model components to extend.}
 
-\item{n.sampling}{Numeric. Number of samples uses in several sampling task throughout the algorithm.
-Check Algorithms 1 and 2 of ??.}
+\item{n.sampling}{Numeric. Number of samples uses in several sampling task throughout the SVI or SCVI algorithm.}
 
-\item{d.sampling}{Logical. If \code{TRUE} computes the expectation \eqn{d = E[Dx]}
+\item{d.sampling}{Logical. If \code{TRUE} the expectations \eqn{d_i = E([\mathbf{D}\mathbf{x}]_i^2)} are computed
 by sampling (slower). If \code{FALSE} (default) uses the mixture Gaussian approximation
-of \eqn{x} obtained in INLA.}
+of \eqn{\mathbf{x}} obtained in INLA.}
 
-\item{method}{Character. Should be either \code{"SCVI"} or \code{"SVI"} if the algorithm
+\item{method}{Character. Should be \code{"SCVI"}, \code{"SVI"}, or \code{"Gibbs"} if the algorithm
 should be the structural and collapsed variational inference algorithm (faster) or the structural
-variational inference algorithm (slower), respectively.}
+variational inference algorithm (slower), or a Gibbs sampler (even slower), respectively.}
 
 \item{fast}{Logical. If \code{TRUE} then INLA will be run with the empirical Bayes mode and
 several control variables will be turned off to improve the speed of the algorithm.}
 
 \item{verbose}{Logical. If \code{TRUE} print the posterior mean of \eqn{\eta} and plot the posterior
-mean of \eqn{V} at each iteration.}
+mean of \eqn{\mathbf{V}} at each iteration.}
 
 \item{history}{Logical. If \code{TRUE} save LGM inla object of each iteration. If \code{FALSE} only
 save the LGM inla object of the last iteration.}
 
-\item{V.init}{List of numeric vectors. Initial values for \eqn{V}. By default \eqn{V=h}.}
+\item{V.init}{List of numeric vectors. Initial values for \eqn{\mathbf{V}}. By default \eqn{\mathbf{V}=\mathbf{h}}.}
 
 \item{eta.init}{Numeric vector. Initial values of \eqn{\eta}. By default eta.init = 0.5.}
 
@@ -77,40 +76,31 @@ save the LGM inla object of the last iteration.}
 of \eqn{\eta} is smaller than \code{stop.rel.change}.}
 }
 \value{
-An S4 object containing the outputs. Elements are accessed with @. The slots are:
+An S4 object containing the outputs. Slots are accessed with @. These are:
 \itemize{
    \item \code{history} List containing summaries and inla objects (if \code{history = TRUE}) of each iteration (except the last one).
-   \item \code{LGM} inla object containing summaries and marginals of the latent field \eqn{x}
-   and hyperparameters \eqn{\theta} of the last iteration.
-   \item \code{summary.mixing} Data frame containing summaries of the mixing variables \eqn{V}.
-   \item \code{summary.ng} Data frame containing summaries of the non-Gaussianiy parameters \eqn{eta}.
-   \item \code{LnGM} List containing the LnGM model specifications
+   \item \code{LGM} inla object containing summaries and marginals of the latent field \eqn{\mathbf{x}}
+   and hyperparameters \eqn{\boldsymbol{\theta}} of the last iteration.
+   \item \code{summary.mixing} Data frame containing summaries of the mixing variables \eqn{\mathbf{V}}.
+   \item \code{summary.ng} Data frame containing summaries of the non-Gaussianiy parameters \eqn{\eta}.
+   \item \code{configs} List containing the LnGM model specifications
  }
 }
 \description{
-Finds the posterior distribution of the hyperparameters \eqn{\theta}, latent field \eqn{x},
-mixing variables \eqn{V} and non-Gaussianity parameters \eqn{\alpha} of latent non-Gaussian models (LnGMs)
+Finds the posterior distribution of the hyperparameters \eqn{\boldsymbol{\theta}}, latent field \eqn{\mathbf{x}},
+mixing variables \eqn{\mathbf{V}}, and non-Gaussianity parameters \eqn{\eta} of latent non-Gaussian models (LnGMs)
 using INLA and variational Bayes approximations. These LnGMs are flexible extensions
 of latent Gaussian models (LGMs). The LnGMs are specified either through
 an INLA object (\code{fit}) that fits an LGM or through a list of configurations (\code{manual.configs}).
 Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several use cases.
 }
 \examples{
- \dontrun{
- #Here we fit an AR1 latent process to the jumpts time series
+ #Here we fit an RW1 latent process to the jumpts time series
  plot(jumpts)
 
- #Set priors on the hyperparameters
- prior.response <- list(prec = list(prior = "loggamma", param = c(1, 0.1)))
- prior.ar1      <- list(theta1 = list(prior = "pc.prec", param = c(3,0.1)),
-                        theta2 = list(prior = "pc.cor0", param = c(0.5,0.5)))
-
-
  #Fit LGM with INLA
- formula <- y ~ -1 + f(x,  model = "ar1", hyper = prior.ar1)
- LGM     <- inla(formula,
-                 data = jumpts,
-                 control.family = list(hyper = prior.response))
+ LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+                 data = jumpts)
 
  #Fit LnGM with ngvb
  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
@@ -121,5 +111,4 @@ Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several us
  plot(LnGM)
  fitted(LnGM)
  samples <- simulate(LnGM)
- }
 }

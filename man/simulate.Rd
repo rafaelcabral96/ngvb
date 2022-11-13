@@ -18,20 +18,39 @@
 \item{n.sampling}{Integer. Number of samples.}
 
 \item{components}{Vector containing \code{c("LGM","V","ng","hyperpar")}.
-If \code{components} contains \code{"LGM"} then it generates samples of \eqn{(x,\theta)} using
+If \code{components} contains \code{"LGM"} then it generates samples of \eqn{(\mathbf{x},\boldsymbol{\theta})} using
 \code{inla.posterior.sample}. If it contains \code{"hyperpar"} then generate samples of
-\eqn{\theta} using \code{inla.hypearpar.sample}. It it contains \code{"V"} or \code{"ng"} then
-generate samples from the mixing variables \eqn{V} and \eqn{\eta} for each model component,
+\eqn{\boldsymbol{\theta}} using \code{inla.hypearpar.sample}. It it contains \code{"V"} or \code{"ng"} then
+generate samples from the mixing variables \eqn{\mathbf{V}} and \eqn{\eta} for each model component,
 respectively.}
 
 \item{long.tailed}{Logical. If \code{TRUE} generate long-tailed samples of the the latent field
-\eqn{x}. It first generates samples of \eqn{(V,\theta)} and then it generates samples of  \eqn{x|V,\theta,y}
+\eqn{\mathbf{x}}. It first generates samples of \eqn{(\mathbf{V},\boldsymbol{\theta})} and then
+it generates samples of  \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta}, \mathbf{y}}
 (which is an LGM) by fitting an INLA model each time and generating n = \code{augmentation} samples.
  Slow. Reduce \code{n.sampling} for speed and increase \code{augmentation} to obtain more samples.}
 
-\item{augmentation}{Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(V,\theta)} generate
-n = \code{augmentation} samples of \eqn{x|V,\theta,y}.}
+\item{augmentation}{Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
+n = \code{augmentation} samples of \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta} , \mathbf{y}}.}
 }
 \description{
 Obtain samples from the fitted LnGM model parameters.
+}
+\examples{
+ #Here we fit an RW1 latent process to the jumpts time series
+ plot(jumpts)
+
+ #Fit LGM with INLA
+ LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+                 data = jumpts)
+
+ #Fit LnGM with ngvb
+ LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+
+ #Available methods
+ summary(LnGM)
+ print(LnGM)
+ plot(LnGM)
+ fitted(LnGM)
+ samples <- simulate(LnGM)
 }

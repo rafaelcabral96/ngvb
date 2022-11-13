@@ -16,3 +16,21 @@
 \description{
 Plots several summaries of an \code{ngvb.list} object.
 }
+\examples{
+ #Here we fit an RW1 latent process to the jumpts time series
+ plot(jumpts)
+
+ #Fit LGM with INLA
+ LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
+                 data = jumpts)
+
+ #Fit LnGM with ngvb
+ LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+
+ #Available methods
+ summary(LnGM)
+ print(LnGM)
+ plot(LnGM)
+ fitted(LnGM)
+ samples <- simulate(LnGM)
+}

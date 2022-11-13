@@ -6,13 +6,14 @@ Author: Rafael Cabral
 Maintainer: Rafael Cabral <rafael.medeiros.cabral@gmail.com>
 Description: This package performs inference of models whose latent field is non-Gaussian using
     variational bayes and Laplace approximations (INLA).
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.1
 Imports:
     ngme,
-    foreach
+    foreach,
+    Matrix
 Depends:
     INLA,
     GIGrvg

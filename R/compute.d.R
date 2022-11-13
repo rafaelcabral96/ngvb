@@ -73,4 +73,3 @@ compute.d.configs <- function(fit, D.config){
 
   return(d)
 }
-
