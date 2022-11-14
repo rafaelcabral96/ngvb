@@ -6,6 +6,4 @@ todo.txt
 inst/doc
 /doc/
 /Meta/
-pkgdowntravis.Rproj
 .Rproj*
-docs
