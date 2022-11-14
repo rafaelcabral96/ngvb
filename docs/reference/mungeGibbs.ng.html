@@ -63,9 +63,9 @@ samples of the non-Gaussianity parameter \(\eta\).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span> <span class="co">#Here we fit an RW1 latent process to the jumpts time series</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span> <span class="co">#Here we fit an RW1 latent process to the jumpts time series</span></span></span>
 <span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">jumpts</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="mungeGibbs.ng-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span> <span class="co">#Fit LGM with INLA</span></span></span>
 <span class="r-in"><span> <span class="va">LGM</span>     <span class="op">&lt;-</span> <span class="fu">inla</span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="fu">f</span><span class="op">(</span><span class="va">x</span>,  model <span class="op">=</span> <span class="st">"rw1"</span><span class="op">)</span>,</span></span>
@@ -74,18 +74,10 @@ samples of the non-Gaussianity parameter \(\eta\).</p>
 <span class="r-in"><span> <span class="co">#Run 10 iterations from the Gibbs sampler</span></span></span>
 <span class="r-in"><span> <span class="va">LnGM.Gibbs</span> <span class="op">&lt;-</span> <span class="fu"><a href="ngvb.html">ngvb</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">LGM</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                    method <span class="op">=</span> <span class="st">"Gibbs"</span>, iter<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Warning: You need to add log(|D|) to mll: check inla.doc(generic0)"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0Oo----------- Iteration 1 -----------oO0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Initial value of eta: 0.5</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>longer object length is not a multiple of shorter object length</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in GIGrvg::rgig(n = 1, lambda = -N[[k]]/2 + 1, psi = 2 * alpha.etak,     chi = sum((Vk - hk)^2/Vk)):</span> invalid parameters for GIG distribution: lambda=-49, chi=inf, psi=2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span> <span class="va">Gibbs.V</span>    <span class="op">&lt;-</span> <span class="fu">mungeGibbs.mixing</span><span class="op">(</span><span class="va">LnGM.Gibbs</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'mungeGibbs.mixing': object 'LnGM.Gibbs' not found</span>
-<span class="r-plt img"><img src="mungeGibbs.ng-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span> <span class="va">Gibbs.eta</span>  <span class="op">&lt;-</span> <span class="fu">mungeGibbs.ng</span><span class="op">(</span><span class="va">LnGM.Gibbs</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'mungeGibbs.ng': object 'LnGM.Gibbs' not found</span>
+<span class="r-in"><span> <span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

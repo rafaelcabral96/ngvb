@@ -57,6 +57,7 @@ setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
 #' @param y Not used.
 #' @param ... Extra arguments to be used in \code{plot(x@LGM, ...)} where \code{x@LGM} is an inla object.
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -73,6 +74,7 @@ setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
 #'  plot(LnGM)
 #'  fitted(LnGM)
 #'  samples <- simulate(LnGM)
+#'  }
 #' @export
 #' @rdname plot
 setMethod("plot",
@@ -106,6 +108,7 @@ setMethod("plot",
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -122,6 +125,7 @@ setMethod("plot",
 #'  plot(LnGM)
 #'  fitted(LnGM)
 #'  samples <- simulate(LnGM)
+#'  }
 #' @export
 #' @rdname summary
 setMethod("summary", "ngvb.list",
@@ -142,6 +146,7 @@ setMethod("summary", "ngvb.list",
 #'
 #' @param x An ngvb.list object (output of \code{ngvb} function)
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -158,6 +163,7 @@ setMethod("summary", "ngvb.list",
 #'  plot(LnGM)
 #'  fitted(LnGM)
 #'  samples <- simulate(LnGM)
+#'  }
 #' @export
 #' @rdname print
 setMethod(f = "print", "ngvb.list",
@@ -173,6 +179,7 @@ setMethod(f = "print", "ngvb.list",
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -189,6 +196,7 @@ setMethod(f = "print", "ngvb.list",
 #'  plot(LnGM)
 #'  fitted(LnGM)
 #'  samples <- simulate(LnGM)
+#'  }
 #' @export
 #' @rdname fitted
 setMethod(f = "fitted", "ngvb.list",
@@ -217,6 +225,7 @@ setMethod(f = "fitted", "ngvb.list",
 #' @param augmentation Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
 #' n = \code{augmentation} samples of \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta} , \mathbf{y}}.
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -233,6 +242,7 @@ setMethod(f = "fitted", "ngvb.list",
 #'  plot(LnGM)
 #'  fitted(LnGM)
 #'  samples <- simulate(LnGM)
+#'  }
 #' @export
 #' @rdname simulate
 setMethod(f = "simulate", "ngvb.list",
@@ -411,6 +421,7 @@ setGeneric("mungeGibbs.mixing",
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -424,6 +435,7 @@ setGeneric("mungeGibbs.mixing",
 #'
 #'  Gibbs.V    <- mungeGibbs.mixing(LnGM.Gibbs)
 #'  Gibbs.eta  <- mungeGibbs.ng(LnGM.Gibbs)
+#'  }
 #' @export
 #' @rdname mungeGibbs.mixing
 setMethod("mungeGibbs.mixing", "ngvb.list",
@@ -461,6 +473,7 @@ setGeneric("mungeGibbs.ng",
 #'
 #' @param object An ngvb.list object (output of \code{ngvb} function)
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -474,6 +487,7 @@ setGeneric("mungeGibbs.ng",
 #'
 #'  Gibbs.V    <- mungeGibbs.mixing(LnGM.Gibbs)
 #'  Gibbs.eta  <- mungeGibbs.ng(LnGM.Gibbs)
+#'  }
 #' @export
 #' @rdname mungeGibbs.ng
 setMethod("mungeGibbs.ng", "ngvb.list",

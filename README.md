@@ -1,5 +1,9 @@
-`ngvb` is an R package that performs inference of latent non-Gaussian models using variational Bayes and Laplace approximations. Several use cases can be found in the online [vignette](http://htmlpreview.github.io/?https://raw.githubusercontent.com/rafaelcabral96/ngvb/master/vignettes/ngvb.html?token=GHSAT0AAAAAABYQK4RHOAAJ7VU3AJR2OTXWY3I3ZOQ).
 
+# About
+
+`ngvb` is an R package that performs inference of latent non-Gaussian models using variational Bayes and Laplace approximations. Read the  [Get started to the ngvb package](https://rafaelcabral96.github.io/ngvb/articles/ngvb.html), for an introduction to the package with several examples.
+
+# Installation instructions
 
 It requires the packages `INLA` and `ngme` which can be installed by:
 

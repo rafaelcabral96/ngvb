@@ -15,6 +15,7 @@ Summary of the fitted values. Also returns the marginals of the fitted values
 if \code{compute=TRUE} in \code{control.predictor} of the inla object \code{fit}.
 }
 \examples{
+\dontrun{
  #Here we fit an RW1 latent process to the jumpts time series
  plot(jumpts)
 
@@ -31,4 +32,5 @@ if \code{compute=TRUE} in \code{control.predictor} of the inla object \code{fit}
  plot(LnGM)
  fitted(LnGM)
  samples <- simulate(LnGM)
+ }
 }

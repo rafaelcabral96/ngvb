@@ -57,6 +57,7 @@
 #'    \item \code{configs} List containing the LnGM model specifications
 #'  }
 #' @examples
+#' \dontrun{
 #'  #Here we fit an RW1 latent process to the jumpts time series
 #'  plot(jumpts)
 #'
@@ -73,6 +74,7 @@
 #'  plot(LnGM)
 #'  fitted(LnGM)
 #'  samples <- simulate(LnGM)
+#'  }
 #' @export
 #'
 ngvb <- function(fit = NULL, manual.configs = NULL,

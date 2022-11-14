@@ -1,5 +1,7 @@
 ---
-title: "ngvb"
+title: "An introduction to the ngvb package"
+author: "Rafael Cabral"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib  
 vignette: >
@@ -15,10 +17,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r message=FALSE, warning=FALSE}
-library(ngvb)
-```
 
+# Introduction
 
 Latent Gaussian models (LGMs) assume that the latent variables $\mathbf{x}^G$ follow a Gaussian random vector with mean $\mathbf{\mu}$  and precision matrix $\mathbf{Q}=  \mathbf{\mathbf{D}}^T \mathbf{D}$. It can be expressed through \begin{equation}\label{eq:gaussian}
 \mathbf{D}(\mathbf{x}^G -\mathbf{\mu})\overset{d}{=} \mathbf{Z},
@@ -36,6 +36,8 @@ We assume the user is familiar with the INLA package (@gomez2020bayesian). Laten
 Here we fit an AR1 latent process to the `jumpts` time series.
 
 ```{r, fig.height=5, fig.width=7}
+library(ngvb)
+
 plot(jumpts)
 ```
 
@@ -89,11 +91,10 @@ We can see in `plot(LnGM)` that the two jump locations were picked up by the mix
 plot(LnGM)
 ```
 
-`LnGM@LGM` contains the inla object containing summaries and marginals of the LGM approximation of $(x,\theta)$ for the last iteration. We show next the log-evidence for each model:
+`LnGM@LGM` contains the inla object containing summaries and marginals of the LGM approximation of $(x,\theta)$ for the last iteration. We show next the Bayes factor:
 
 ```{r}
-LGM$mlik[2]
-LnGM@LGM$mlik[2]
+exp(LnGM@LGM$mlik[2] - LGM$mlik[2])
 ```
 
 
@@ -138,10 +139,9 @@ plot(LnGM)
 
 For the random slopes (subject2), the posterior means of the mixing variables $V$ are very close to 1, and $\eta$ is close to 0, suggesting that a non-Gaussian model for this component is not necessary.
 
-We show next the log-evidence for each model:
+We show next the Bayes factor:
 ```{r}
-LGM$mlik[2]
-LnGM@LGM$mlik[2]
+exp(LnGM@LGM$mlik[2] - LGM$mlik[2])
 ```
 
 # SAR model (using manual.configs)
@@ -159,8 +159,7 @@ where $\mathrm{HV}_i$ and $\mathrm{HI}_i$ are the average household value and ho
 
 We consider a simultaneous autoregressive (SAR) model for the spatially structured effects $\mathbf{x}$. The Gaussian version of this model can be built from the following system $\mathbf{D}_{SAR}\mathbf{x} = \sigma_{\mathbf{x}}\mathbf{Z}$, where $\mathbf{D}_{SAR}=\mathbf{I}-\rho\mathbf{W}$. $\mathbf{W}$ is a row standardized adjacency matrix and $-1<\rho<1$. The equivalent model driven by NIG noise is then $\mathbf{D}_{SAR}\mathbf{x} = \sigma_{\mathbf{x}}\mathbf{\Lambda}$, where $\mathbf{\Lambda}$ is i.i.d. standardized NIG noise. 
 
-Gaussian SAR models are not implemented in INLA, so we have to use the `rgeneric` or `cgeneric` functionalities (@gomez2020bayesian). We start by loading the data and constructing the matrix $\mathbf{W}$ 
-
+Gaussian SAR models are not implemented in INLA, so we have to use the `rgeneric` or `cgeneric` functionalities (@gomez2020bayesian). We start by loading and preparing the data.
 
 ```{r message=FALSE, warning=FALSE, fig.height=5, fig.width=7}
 # Required package names
@@ -175,18 +174,22 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 data(columbus)
 data    <- columbus[,c("CRIME","HOVAL","INC")]       # data
-N    <- nrow(data)                                   # number of counties
+N       <- nrow(data)                                   # number of counties
 data$s  <- 1:N 
-map  <- readOGR(system.file("shapes/columbus.shp", package="spData")[1]) #shape file containing the polygons
+map     <- readOGR(system.file("shapes/columbus.shp", package="spData")[1]) #shape file containing the polygons
 plot(map)
+```
 
+We construct now the row standardized adjacency matrix $\mathbf{W}$ 
 
+```{r}
 nb_q <- poly2nb(map)                                   # Construct neighbours list from polygon list
 nb_W <- nb2listw(nb_q, style="B", zero.policy=TRUE)    # Spatial weights for neighbours lists
 W    <- as.matrix(as(nb_W, "sparseMatrix"))            # Adjacency matrix W
 W    <- diag(1/rowSums(W))%*%W                         # Row standardize adjacency matrix  
 eigenv    <- eigen(W)$values                           # Eigenvalues of W. We need them to compute the log-determinant of the precision matrix
 ```
+
 
 We now implement the latent process $\mathbf{x}|\mathbf{y},\mathbf{V},\sigma_x,\rho \sim N(\mathbf{0}, \sigma_x^{-2} \mathbf{D}_{SAR}^{-1} \text{diag}(\mathbf{V})\mathbf{D}_{SAR}^{-T})$ in `rgeneric`. The precision matrix is $\mathbf{Q} = \tau_x \mathbf{D}_{SAR}^T \text{diag}(\mathbf{V})^{-1}\mathbf{D}_{SAR}$ and it is defined in the `Q` function. We consider a $\text{Unif}(0,1)$ prior on $\rho$ and a half-normal prior on $\tau_x$.
 
@@ -292,12 +295,7 @@ If $\mathbf{V}=\mathbf{1}$ then the latent field is Gaussian and `inla.fit.V` gi
 ```{r, fig.height=5, fig.width=7}
 LGM <- inla.fit.V(list(rep(1,N)))
 
-LGM$summary.hyperpar
-LGM$mlik[2]
-
-#posterior marginals of the precision tau_x and  autocorrelation parameter rho
-plot(inla.tmarginal(function(x)  exp(x), LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "precision")
-plot(inla.tmarginal(function(x)  exp(x)/(1+exp(x)), LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "rho")
+LGM$summary.fixed
 ```
 
 We now define the LnGM in `ngvb` using the `manual.configs` argument. `manual.configs` should be a list containing `inla.fit.V`. It should also include `Dfunc` which is a list containing the functions $\mathbf{D}_{SAR}(\boldsymbol{\theta})$ for each model component, that receive as input all hyperparameters $\boldsymbol{\theta}$ in internal scale, and outputs $\mathbf{D}_{SAR}(\boldsymbol{\theta})$. Finally, `manual.configs` also needs `h`, a list containing all predefined constant vectors (see @cabral2022controlling) for each model component.
@@ -321,19 +319,21 @@ We now call `ngvb`, and analyze the output.
 LnGM <- ngvb(manual.configs = manual.configs, selection = list(s=1:N), 
              iter = 10, d.sampling = TRUE, n.sampling = 1000)
 
-plot(LnGM)
+LnGM@LGM$summary.fixed
 ```
 
 We can see in `plot(LnGM)` that more flexibility was added in 2 counties.
 
 ```{r, fig.height=5, fig.width=7}
 plot(LnGM)
-LnGM@LGM$mlik[2]
-
-#posterior marginals of the precision tau_x and  autocorrelation parameter rho
-plot(inla.tmarginal(function(x)  exp(x), LnGM@LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "precision")
-plot(inla.tmarginal(function(x)  exp(x)/(1+exp(x)), LnGM@LGM$marginals.hyperpar$`Theta2 for s`), type = 'l', col = 'red', main = "rho")
 ```
+
+The Bayes factor is:
+
+```{r, fig.height=5, fig.width=7}
+exp(LnGM@LGM$mlik[2]-LGM$mlik[2])
+```
+
 
 
 

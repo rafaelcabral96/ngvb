@@ -17,6 +17,7 @@
 Plots several summaries of an \code{ngvb.list} object.
 }
 \examples{
+\dontrun{
  #Here we fit an RW1 latent process to the jumpts time series
  plot(jumpts)
 
@@ -33,4 +34,5 @@ Plots several summaries of an \code{ngvb.list} object.
  plot(LnGM)
  fitted(LnGM)
  samples <- simulate(LnGM)
+ }
 }

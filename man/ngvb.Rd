@@ -95,6 +95,7 @@ an INLA object (\code{fit}) that fits an LGM or through a list of configurations
 Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several use cases.
 }
 \examples{
+\dontrun{
  #Here we fit an RW1 latent process to the jumpts time series
  plot(jumpts)
 
@@ -111,4 +112,5 @@ Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several us
  plot(LnGM)
  fitted(LnGM)
  samples <- simulate(LnGM)
+ }
 }

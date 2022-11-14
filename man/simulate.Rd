@@ -37,6 +37,7 @@ n = \code{augmentation} samples of \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\t
 Obtain samples from the fitted LnGM model parameters.
 }
 \examples{
+\dontrun{
  #Here we fit an RW1 latent process to the jumpts time series
  plot(jumpts)
 
@@ -53,4 +54,5 @@ Obtain samples from the fitted LnGM model parameters.
  plot(LnGM)
  fitted(LnGM)
  samples <- simulate(LnGM)
+ }
 }

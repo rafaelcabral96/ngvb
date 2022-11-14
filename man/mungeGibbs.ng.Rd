@@ -15,6 +15,7 @@ Process \code{ngvb.list} when \code{method = "Gibbs"}. Produces a matrix with th
 samples of the non-Gaussianity parameter \eqn{\eta}.
 }
 \examples{
+\dontrun{
  #Here we fit an RW1 latent process to the jumpts time series
  plot(jumpts)
 
@@ -28,4 +29,5 @@ samples of the non-Gaussianity parameter \eqn{\eta}.
 
  Gibbs.V    <- mungeGibbs.mixing(LnGM.Gibbs)
  Gibbs.eta  <- mungeGibbs.ng(LnGM.Gibbs)
+ }
 }
