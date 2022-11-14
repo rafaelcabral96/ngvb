@@ -165,21 +165,33 @@ the other arguments.</p>
 <span><span class="co">#&gt; Initial value of eta: 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.656</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.667</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.557</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.553</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.636</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.655</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.651</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.63</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.654</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.65</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  0Oo----------- Convergence achieved -----------oO0</span></span></code></pre></div>
+<span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.661</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.672</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.64</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.667</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  0Oo----------- Maximum number of iterations reached -----------oO0</span></span></code></pre></div>
 <p><code>LnGM</code> is an S4 object of class <code>ngvb.list</code>
 containing the outputs, which can be accessed with
 <code>LnGM@...</code>. Available methods are <code>summary</code>,
@@ -202,7 +214,7 @@ and marginals of the LGM approximation of <span class="math inline">\((x,\theta)
 show next the Bayes factor:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 339011578</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 480551581</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="random-slople-random-intercept-model-several-model-components">Random slople, random intercept model (several model
@@ -270,33 +282,33 @@ intercepts and slopes.</p>
 <span><span class="co">#&gt; Initial value of eta: 0.5 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.269 0.135</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.282 0.135</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.341 0.153</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.367 0.145</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.377 0.156</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.352 0.153</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.371 0.155</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.368 0.158</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.375 0.149</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.385 0.158</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.387 0.146</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.365 0.164</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.36 0.164</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.382 0.161</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.385 0.156</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.384 0.156</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.383 0.156</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.375 0.163</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  0Oo----------- Convergence achieved -----------oO0</span></span>
+<span><span class="co">#&gt;  0Oo----------- Maximum number of iterations reached -----------oO0</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ngvb_files/figure-html/unnamed-chunk-13-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-13-2.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-13-3.png" width="672"></p>
@@ -307,7 +319,7 @@ that a non-Gaussian model for this component is not necessary.</p>
 <p>We show next the Bayes factor:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6.470638</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 6.198424</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sar-model-using-manual-configs">SAR model (using manual.configs)<a class="anchor" aria-label="anchor" href="#sar-model-using-manual-configs"></a>
@@ -521,37 +533,34 @@ component.</p>
 <span><span class="co">#&gt; Initial value of eta: 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.378</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.379</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.54</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.553</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.611</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.62</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.657</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.656</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.677</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.675</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.661</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.656</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.677</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0Oo----------- Convergence achieved -----------oO0</span></span>
 <span></span>
 <span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">summary.fixed</span></span>
 <span><span class="co">#&gt;                   mean         sd 0.025quant   0.5quant  0.975quant       mode</span></span>
-<span><span class="co">#&gt; (Intercept) 58.0634589 5.32960066 47.0625676 58.2191942 68.12741259 58.4823753</span></span>
-<span><span class="co">#&gt; HOVAL       -0.1708005 0.07648889 -0.3209726 -0.1709664 -0.01968254 -0.1712887</span></span>
-<span><span class="co">#&gt; INC         -1.1712055 0.30013848 -1.7779383 -1.1654688 -0.59595840 -1.1534849</span></span>
+<span><span class="co">#&gt; (Intercept) 58.1707841 5.41513664 46.8447208 58.3644435 68.30505968 58.6735195</span></span>
+<span><span class="co">#&gt; HOVAL       -0.1704185 0.07731244 -0.3222427 -0.1705966 -0.01758118 -0.1709458</span></span>
+<span><span class="co">#&gt; INC         -1.1874464 0.30496204 -1.8018733 -1.1821647 -0.60139055 -1.1707625</span></span>
 <span><span class="co">#&gt;                      kld</span></span>
-<span><span class="co">#&gt; (Intercept) 5.676251e-08</span></span>
-<span><span class="co">#&gt; HOVAL       9.045345e-09</span></span>
-<span><span class="co">#&gt; INC         3.276556e-08</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) 2.248469e-07</span></span>
+<span><span class="co">#&gt; HOVAL       1.069322e-08</span></span>
+<span><span class="co">#&gt; INC         2.582258e-08</span></span></code></pre></div>
 <p>We can see in <code>plot(LnGM)</code> that more flexibility was added
 in 2 counties.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -560,7 +569,7 @@ in 2 counties.</p>
 <p>The Bayes factor is:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">-</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 206250.9</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 130411.9</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-cabral2022controlling" class="csl-entry">
 Cabral, Rafael, David Bolin, and Håvard Rue. 2022. <span>“Controlling
