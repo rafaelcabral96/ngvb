@@ -292,7 +292,7 @@ inla.fit.V <- function(V){
 
 If $\mathbf{V}=\mathbf{1}$ then the latent field is Gaussian and `inla.fit.V` gives us the LGM.
 
-```{r, fig.height=5, fig.width=7}
+```{r}
 LGM <- inla.fit.V(list(rep(1,N)))
 
 LGM$summary.fixed
@@ -315,7 +315,7 @@ manual.configs <- list(inla.fit.V = inla.fit.V, Dfunc = Dfunc, h = h)
 
 We now call `ngvb`, and analyze the output.
 
-```{r, fig.height=5, fig.width=7}
+```{r}
 LnGM <- ngvb(manual.configs = manual.configs, selection = list(s=1:N), 
              iter = 10, d.sampling = TRUE, n.sampling = 1000)
 
@@ -330,7 +330,7 @@ plot(LnGM)
 
 The Bayes factor is:
 
-```{r, fig.height=5, fig.width=7}
+```{r}
 exp(LnGM@LGM$mlik[2]-LGM$mlik[2])
 ```
 
