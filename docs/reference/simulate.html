@@ -50,7 +50,7 @@
 <span>  <span class="va">object</span>,</span>
 <span>  n.sampling <span class="op">=</span> <span class="va">object</span><span class="op">@</span><span class="va">configs</span><span class="op">$</span><span class="va">n.sampling</span>,</span>
 <span>  components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LGM"</span>, <span class="st">"V"</span>, <span class="st">"ng"</span><span class="op">)</span>,</span>
-<span>  long.tailed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  improved.tail <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  augmentation <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -74,8 +74,8 @@ generate samples from the mixing variables \(\mathbf{V}\) and \(\eta\) for each 
 respectively.</p></dd>
 
 
-<dt>long.tailed</dt>
-<dd><p>Logical. If <code>TRUE</code> generate long-tailed samples of the the latent field
+<dt>improved.tail</dt>
+<dd><p>Logical. If <code>TRUE</code> generate leptokurtic samples of the the latent field
 \(\mathbf{x}\). It first generates samples of \((\mathbf{V},\boldsymbol{\theta})\) and then
 it generates samples of  \(\mathbf{x} | \mathbf{V} , \boldsymbol{\theta}, \mathbf{y}\)
 (which is an LGM) by fitting an INLA model each time and generating n = <code>augmentation</code> samples.
@@ -83,7 +83,7 @@ it generates samples of  \(\mathbf{x} | \mathbf{V} , \boldsymbol{\theta}, \mathb
 
 
 <dt>augmentation</dt>
-<dd><p>Integer. If <code>long.tailed = TRUE</code>, then for each sample of \((\mathbf{V},\boldsymbol{\theta})\) generate
+<dd><p>Integer. If <code>improved.tail = TRUE</code>, then for each sample of \((\mathbf{V},\boldsymbol{\theta})\) generate
 n = <code>augmentation</code> samples of \(\mathbf{x} | \mathbf{V} , \boldsymbol{\theta} , \mathbf{y}\).</p></dd>
 
 </dl></div>

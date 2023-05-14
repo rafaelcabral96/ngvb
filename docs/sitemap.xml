@@ -16,13 +16,16 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/reference/areal.plot.html</loc>
+  </url>
+  <url>
     <loc>/reference/fitted.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geo.plot.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
@@ -37,6 +40,9 @@
     <loc>/reference/mungeGibbs.ng.html</loc>
   </url>
   <url>
+    <loc>/reference/ng.check.html</loc>
+  </url>
+  <url>
     <loc>/reference/ngvb.html</loc>
   </url>
   <url>
@@ -47,6 +53,9 @@
   </url>
   <url>
     <loc>/reference/Orthodont.plot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot.gaussdiag.html</loc>
   </url>
   <url>
     <loc>/reference/plot.html</loc>

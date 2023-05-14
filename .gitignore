@@ -9,3 +9,4 @@ inst/doc
 .Rproj*
 /inst/cfiles/cgeneric-ngvb.so
 /inst/cfiles/cgeneric-ngvb.o
+/R/score_backup.R

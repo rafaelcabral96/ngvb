@@ -63,7 +63,7 @@ We check the adequacy of the latent Gaussian assumption for this model and data 
 It also plots the overall BF sensitivity $s_0(\mathbf{y}) = \sum_i d_i(\mathbf{y})$ (red line) against its reference distribution. A high mismatch suggests that there could be non-Gaussian features in the observed data that are better modelled by an LnGM.
 
 
-```{r}
+```{r, fig.height=5, fig.width=7}
 check.list <- ng.check(LGM)
 ```
 
@@ -132,7 +132,7 @@ LGM <- inla(formula,
 
 We now run the `ng.check` function to generate diagnostic plots regarding the latent Gaussianity assumption.
 
-```{r}
+```{r, fig.height=5, fig.width=7}
 check.list <- ng.check(LGM)
 ```
 
@@ -331,7 +331,7 @@ manual.configs <- list(inla.fit.V = inla.fit.V, Dfunc = Dfunc, h = h)
 ```
 
 We run the diagnostic plots first as follows.
-```{r}
+```{r, fig.height=5, fig.width=7}
 check.list <- ng.check(LGM, Dfunc, h)
 ```
 

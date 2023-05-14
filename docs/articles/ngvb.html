@@ -62,7 +62,7 @@
                         <h4 data-toc-skip class="author">Rafael
 Cabral</h4>
             
-            <h4 data-toc-skip class="date">2022-11-14</h4>
+            <h4 data-toc-skip class="date">2023-05-14</h4>
       
       
       <div class="d-none name"><code>ngvb.Rmd</code></div>
@@ -102,9 +102,9 @@ We present next a series of examples on how to use the <code>ngvb</code>
 package.</p>
 </div>
 <div class="section level2">
-<h2 id="ar1-model">AR1 model<a class="anchor" aria-label="anchor" href="#ar1-model"></a>
+<h2 id="rw1-model">RW1 model<a class="anchor" aria-label="anchor" href="#rw1-model"></a>
 </h2>
-<p>Here we fit an AR1 latent process to the <code>jumpts</code> time
+<p>Here we fit an RW1 latent process to the <code>jumpts</code> time
 series.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ngvb</span><span class="op">)</span></span>
@@ -125,32 +125,47 @@ y_i = \sigma_x x_i + \sigma_y \epsilon_i,
 \]</span></p>
 <p>where <span class="math inline">\(\epsilon_i\)</span> is standard
 Gaussian noise, and <span class="math inline">\(\mathbf{x}=[x_1,\dotsc,x_{100}]^T\)</span> follows
-a non-Gaussian AR1 prior, defined by <span class="math inline">\(x_{i}=\rho x_{i-1} + \Lambda_i,
-i=2,\dotsc,100\)</span>, where <span class="math inline">\(\rho\)</span>
-is the autocorrelation and <span class="math inline">\(\Lambda_i\)</span> is normal-inverge Gaussian
-(NIG) noise with non-Gaussianity parameter <span class="math inline">\(\eta\)</span>.</p>
-<p>We define the prior on <span class="math inline">\(\tau_y =
-\sigma_y^{-2}\)</span>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prec.prior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>prec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>prior <span class="op">=</span> <span class="st">"loggamma"</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>and the prior on <span class="math inline">\(\tau_x =
-\sigma_x^{-2}\)</span> and <span class="math inline">\(\rho\)</span>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prior.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>theta1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>prior <span class="op">=</span> <span class="st">"pc.prec"</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                   theta2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>prior <span class="op">=</span> <span class="st">"pc.cor0"</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+a non-Gaussian RW1 prior, defined by <span class="math inline">\(x_{i}=
+x_{i-1} + \Lambda_i(\eta), i=2,\dotsc,100\)</span>, where <span class="math inline">\(\Lambda_i(\eta)\)</span> is normal-inverge
+Gaussian (NIG) noise with non-Gaussianity parameter <span class="math inline">\(\eta\)</span> (<span class="math inline">\(\eta=0\)</span> leads to the Gaussian model).</p>
 <p>First, we start by fitting a latent Gaussian model (LGM), where the
 driving noise of the latent field is normally distributed:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">x</span>,  model <span class="op">=</span> <span class="st">"ar1"</span>, hyper <span class="op">=</span> <span class="va">prior.list</span><span class="op">)</span> </span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">x</span>,  model <span class="op">=</span> <span class="st">"rw1"</span><span class="op">)</span> </span>
 <span><span class="va">LGM</span>     <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span><span class="va">formula</span>, </span>
 <span>                data <span class="op">=</span> <span class="va">jumpts</span>,</span>
-<span>                control.family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>hyper <span class="op">=</span> <span class="va">prec.prior</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Next, we consider the non-Gaussian version of the previous model,
+<span>                control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>config <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>We check the adequacy of the latent Gaussian assumption for this
+model and data through the <code>ng.check</code> function, which
+provides a set of diagnostic tools. It plots <span class="math inline">\(d_i(\mathbf{y}), \ i=1,\dotsc,n\)</span>, the
+local increase (for small <span class="math inline">\(\eta\)</span>) in
+the Bayes factor (BF) when we make the latent field non-Gaussian. High
+values of <span class="math inline">\(d_i(\mathbf{y})\)</span> for a
+particular index <span class="math inline">\(i\)</span> indicate that
+making the driving noise <span class="math inline">\(\Lambda_i(\eta)\)</span> non-Gaussian increases
+the Bayes Factor, and thus indicating the lack of flexibility of the
+latent Gaussian assumption at that location. Notice that the two sudden
+jumps are detected in the next plot.</p>
+<p>It also plots the overall BF sensitivity <span class="math inline">\(s_0(\mathbf{y}) = \sum_i d_i(\mathbf{y})\)</span>
+(red line) against its reference distribution. A high mismatch suggests
+that there could be non-Gaussian features in the observed data that are
+better modelled by an LnGM.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">check.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ng.check.html">ng.check</a></span><span class="op">(</span><span class="va">LGM</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: geom_vline(): Ignoring `mapping` because `xintercept` was provided.</span></span>
+<span><span class="co">#&gt; $plot.ranking</span></span></code></pre></div>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $plot.ref</span></span>
+<span><span class="co">#&gt; $plot.ref[[1]]</span></span></code></pre>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-4-2.png" width="672"></p>
+<p>The diagnostic plots suggest we could benefit from fitting an LnGM.
+Next, we consider the non-Gaussian version of the previous LGM model,
 where the latent field is driven by NIG noise. We use the output of the
 <code>inla</code> function <code>LGM</code> as the input of the
 <code>ngvb</code> function. First, we need to specify which components
 will be made non-Gaussian in the <code>selection</code> argument. In
-this case, the AR1 component has the name <code>x</code> and dimension
+this case, the RW1 component has the name <code>x</code> and dimension
 100, so we write <code>selection = list(x=1:100)</code>. By default, the
 leptokurtosis parameter <span class="math inline">\(\eta\)</span> has an
 exponential prior with rate parameter equal to 1. This can be changed
@@ -158,38 +173,37 @@ with the argument <code>alpha.eta</code>. Run <code><a href="../reference/ngvb.h
 the other arguments.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">LGM</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in inla.model.properties.generic(inla.trim.family(model), mm[names(mm) == : Model 'cgeneric' in section 'latent' is marked as 'experimental'; changes may appear at any time.</span></span>
-<span><span class="co">#&gt;   Use this model with extra care!!! Further warnings are disabled.</span></span>
+<span><span class="co">#&gt; [1] "Warning: You need to add log(|D|) to mll: check inla.doc(generic0)"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 1 -----------oO0</span></span>
 <span><span class="co">#&gt; Initial value of eta: 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.667</span></span>
+<span><span class="co">#&gt; Expectation of eta: 4.784</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.553</span></span>
+<span><span class="co">#&gt; Expectation of eta: 3.999</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.655</span></span>
+<span><span class="co">#&gt; Expectation of eta: 3.442</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.63</span></span>
+<span><span class="co">#&gt; Expectation of eta: 3.068</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.65</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.773</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.661</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.609</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.672</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.53</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.64</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.416</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.667</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.453</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0Oo----------- Maximum number of iterations reached -----------oO0</span></span></code></pre></div>
 <p><code>LnGM</code> is an S4 object of class <code>ngvb.list</code>
@@ -208,13 +222,13 @@ were picked up by the mixing variables <span class="math inline">\(V\)</span> (w
 locations), and the evolution of the parameter <span class="math inline">\(\eta\)</span> seems to indicate convergence.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ngvb_files/figure-html/unnamed-chunk-8-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-8-2.png" width="672"></p>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-7-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-7-2.png" width="672"></p>
 <p><code>LnGM@LGM</code> contains the inla object containing summaries
 and marginals of the LGM approximation of <span class="math inline">\((x,\theta)\)</span> for the last iteration. We
 show next the Bayes factor:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 480551581</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 9.994401e+14</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="random-slople-random-intercept-model-several-model-components">Random slople, random intercept model (several model
@@ -227,7 +241,7 @@ Trellis plot, where female subjects have labels starting with F and male
 subjects starting with M.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Orthodont.plot</span>, layout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">16</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ngvb_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
 <p>We use the following linear mixed-effects model to describe the
 response growth with age:</p>
 <p><span class="math display">\[
@@ -271,55 +285,82 @@ covariates.</p>
 <code class="sourceCode R"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">value</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">Female</span> <span class="op">+</span> <span class="va">time</span> <span class="op">+</span> <span class="va">tF</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">subject</span>, model <span class="op">=</span> <span class="st">"iid"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">subject2</span>, <span class="va">time</span>, model <span class="op">=</span> <span class="st">"iid"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">LGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span><span class="va">formula</span>,</span>
-<span>            data <span class="op">=</span> <span class="va">Orthodont</span><span class="op">)</span></span></code></pre></div>
-<p>We consider the prior random effects to be distributed according to
-long-tailed NIG variables to accommodate possible outliers in the
-intercepts and slopes.</p>
+<span>            data <span class="op">=</span> <span class="va">Orthodont</span>,</span>
+<span>            control.compute <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>config <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>We now run the <code>ng.check</code> function to generate diagnostic
+plots regarding the latent Gaussianity assumption.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">check.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ng.check.html">ng.check</a></span><span class="op">(</span><span class="va">LGM</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: geom_vline(): Ignoring `mapping` because `xintercept` was provided.</span></span>
+<span><span class="co">#&gt; geom_vline(): Ignoring `mapping` because `xintercept` was provided.</span></span>
+<span><span class="co">#&gt; $plot.ranking</span></span></code></pre></div>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $plot.ref</span></span>
+<span><span class="co">#&gt; $plot.ref[[1]]</span></span></code></pre>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-12-2.png" width="672"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $plot.ref[[2]]</span></span></code></pre>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-12-3.png" width="672"></p>
+<p>The last two plots do not show a large mismatch between <span class="math inline">\(s_0(\mathbf{y})\)</span> and its reference
+distribution. The sensitivity measures of the fixed effects relative to
+the latent Gaussianity assumption for the random intercepts (subject)
+and random slopes (subject2) is shown next. These are small compared to
+the posterior standard deviation of the fixed effects.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">check.list</span><span class="op">$</span><span class="va">sens.fixed.matrix</span></span>
+<span><span class="co">#&gt;            (Intercept)        Female          time           tF</span></span>
+<span><span class="co">#&gt; subject  -6.467191e-01  8.005355e-01 -4.748893e-05 1.165662e-04</span></span>
+<span><span class="co">#&gt; subject2 -9.455233e-11 -2.395009e-07 -2.940273e-07 2.397182e-07</span></span></code></pre></div>
+<p>However, for illustration purposes, we still fit an LnGM. We consider
+the prior random effects to be distributed according to long-tailed NIG
+variables to accommodate possible outliers in the intercepts and
+slopes.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span><span class="va">LGM</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>subject <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">27</span>, subject2 <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">27</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 1 -----------oO0</span></span>
 <span><span class="co">#&gt; Initial value of eta: 0.5 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.282 0.135</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.278 0.13</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.367 0.145</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.354 0.154</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.352 0.153</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.372 0.153</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.368 0.158</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.372 0.15</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.385 0.158</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.379 0.154</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.365 0.164</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.397 0.165</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.382 0.161</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.376 0.162</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.384 0.156</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.386 0.161</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.375 0.163</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.365 0.151</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0Oo----------- Maximum number of iterations reached -----------oO0</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ngvb_files/figure-html/unnamed-chunk-13-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-13-2.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-13-3.png" width="672"></p>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-14-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-14-2.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-14-3.png" width="672"></p>
 <p>For the random slopes (subject2), the posterior means of the mixing
 variables <span class="math inline">\(V\)</span> are very close to 1,
 and <span class="math inline">\(\eta\)</span> is close to 0, suggesting
 that a non-Gaussian model for this component is not necessary.</p>
 <p>We show next the Bayes factor:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6.198424</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 6.051284</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sar-model-using-manual-configs">SAR model (using manual.configs)<a class="anchor" aria-label="anchor" href="#sar-model-using-manual-configs"></a>
@@ -354,7 +395,7 @@ NIG noise.</p>
 the <code>rgeneric</code> or <code>cgeneric</code> functionalities
 (<span class="citation">Gómez-Rubio (2020)</span>). We start by loading
 and preparing the data.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Required package names</span></span>
 <span><span class="va">packages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"spdep"</span>, <span class="st">"rgdal"</span><span class="op">)</span> </span>
 <span></span>
@@ -376,21 +417,24 @@ and preparing the data.</p>
 <span><span class="co">#&gt; It has 20 fields</span></span>
 <span><span class="co">#&gt; Integer64 fields read as strings:  COLUMBUS_ COLUMBUS_I POLYID</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">map</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ngvb_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
 <p>We construct now the row standardized adjacency matrix <span class="math inline">\(\mathbf{W}\)</span></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">nb_q</span> <span class="op">&lt;-</span> <span class="fu">poly2nb</span><span class="op">(</span><span class="va">map</span><span class="op">)</span>                                   <span class="co"># Construct neighbours list from polygon list</span></span>
-<span><span class="va">nb_W</span> <span class="op">&lt;-</span> <span class="fu">nb2listw</span><span class="op">(</span><span class="va">nb_q</span>, style<span class="op">=</span><span class="st">"B"</span>, zero.policy<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>    <span class="co"># Spatial weights for neighbours lists</span></span>
-<span><span class="va">W</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu">as</span><span class="op">(</span><span class="va">nb_W</span>, <span class="st">"sparseMatrix"</span><span class="op">)</span><span class="op">)</span>            <span class="co"># Adjacency matrix W</span></span>
-<span><span class="va">W</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">W</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">W</span>                         <span class="co"># Row standardize adjacency matrix  </span></span>
-<span><span class="va">eigenv</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eigen.html" class="external-link">eigen</a></span><span class="op">(</span><span class="va">W</span><span class="op">)</span><span class="op">$</span><span class="va">values</span>                           <span class="co"># Eigenvalues of W. We need them to compute the log-determinant of the precision matrix</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nb_q</span> <span class="op">&lt;-</span> <span class="fu">poly2nb</span><span class="op">(</span><span class="va">map</span><span class="op">)</span>              <span class="co"># Construct neighbours list from polygon list</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nb_q</span><span class="op">)</span></span>
+<span><span class="va">W</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow<span class="op">=</span><span class="va">n</span>, ncol<span class="op">=</span><span class="va">n</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nb_q</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">W</span><span class="op">[</span><span class="va">i</span>,<span class="va">nb_q</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> </span>
+<span><span class="op">}</span></span>
+<span><span class="va">W</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">W</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">W</span>    <span class="co"># Row standardize adjacency matrix </span></span>
+<span><span class="va">eigenv</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eigen.html" class="external-link">eigen</a></span><span class="op">(</span><span class="va">W</span><span class="op">)</span><span class="op">$</span><span class="va">values</span>      <span class="co"># Eigenvalues of W. We need them to compute the log-determinant of the nb_q</span></span></code></pre></div>
 <p>We now implement the latent process <span class="math inline">\(\mathbf{x}|\mathbf{y},\mathbf{V},\sigma_x,\rho
 \sim N(\mathbf{0}, \sigma_x^{-2} \mathbf{D}_{SAR}^{-1}
 \text{diag}(\mathbf{V})\mathbf{D}_{SAR}^{-T})\)</span> in
 <code>rgeneric</code>. The precision matrix is <span class="math inline">\(\mathbf{Q} = \tau_x \mathbf{D}_{SAR}^T
 \text{diag}(\mathbf{V})^{-1}\mathbf{D}_{SAR}\)</span> and it is defined
 in the <code>Q</code> function. We consider a <span class="math inline">\(\text{Unif}(0,1)\)</span> prior on <span class="math inline">\(\rho\)</span> and a half-normal prior on <span class="math inline">\(\tau_x\)</span>.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="st">'inla.rgeneric.sar.model'</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">cmd</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"graph"</span>, <span class="st">"Q"</span>, <span class="st">"mu"</span>, <span class="st">"initial"</span>, <span class="st">"log.norm.const"</span>,</span>
 <span>            <span class="st">"log.prior"</span>, <span class="st">"quit"</span><span class="op">)</span>,</span>
@@ -474,7 +518,7 @@ corresponds to each model component to extend to non-Gaussianity (in
 this example, there is just one model component). The argument
 <code>control.compute = list(config = TRUE)</code> in the
 <code>inla</code> function is required.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla.fit.V</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">V</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="va">model</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/rgeneric.html" class="external-link">inla.rgeneric.define</a></span><span class="op">(</span><span class="va">inla.rgeneric.sar.model</span>, n <span class="op">=</span> <span class="va">N</span>, V <span class="op">=</span> <span class="va">V</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, W <span class="op">=</span> <span class="va">W</span>, eigenv <span class="op">=</span> <span class="va">eigenv</span><span class="op">)</span></span>
@@ -490,7 +534,7 @@ this example, there is just one model component). The argument
 <p>If <span class="math inline">\(\mathbf{V}=\mathbf{1}\)</span> then
 the latent field is Gaussian and <code>inla.fit.V</code> gives us the
 LGM.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">LGM</span> <span class="op">&lt;-</span> <span class="fu">inla.fit.V</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">N</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in inla.model.properties.generic(inla.trim.family(model), mm[names(mm) == : Model 'rgeneric' in section 'latent' is marked as 'experimental'; changes may appear at any time.</span></span>
 <span><span class="co">#&gt;   Use this model with extra care!!! Further warnings are disabled.</span></span>
@@ -513,7 +557,7 @@ and outputs <span class="math inline">\(\mathbf{D}_{SAR}(\boldsymbol{\theta})\)<
 Finally, <code>manual.configs</code> also needs <code>h</code>, a list
 containing all predefined constant vectors (see <span class="citation">Cabral, Bolin, and Rue (2022)</span>) for each model
 component.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">D1</span>  <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">theta</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">prec</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="fl">2L</span><span class="op">]</span><span class="op">)</span> </span>
 <span>  <span class="va">rho</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="fl">3L</span><span class="op">]</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">theta</span><span class="op">[</span><span class="fl">3L</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
@@ -524,8 +568,19 @@ component.</p>
 <span><span class="va">h</span>         <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">N</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">manual.configs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>inla.fit.V <span class="op">=</span> <span class="va">inla.fit.V</span>, Dfunc <span class="op">=</span> <span class="va">Dfunc</span>, h <span class="op">=</span> <span class="va">h</span><span class="op">)</span></span></code></pre></div>
-<p>We now call <code>ngvb</code>, and analyze the output.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<p>We run the diagnostic plots first as follows.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">check.list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ng.check.html">ng.check</a></span><span class="op">(</span><span class="va">LGM</span>, <span class="va">Dfunc</span>, <span class="va">h</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: geom_vline(): Ignoring `mapping` because `xintercept` was provided.</span></span>
+<span><span class="co">#&gt; $plot.ranking</span></span></code></pre></div>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $plot.ref</span></span>
+<span><span class="co">#&gt; $plot.ref[[1]]</span></span></code></pre>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-22-2.png" width="672"></p>
+<p>The last plots identify an outlying county. To fit the LnGM, we now
+call <code>ngvb</code>, and analyze the output.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span>manual.configs <span class="op">=</span> <span class="va">manual.configs</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">N</span><span class="op">)</span>, </span>
 <span>             iter <span class="op">=</span> <span class="fl">10</span>, d.sampling <span class="op">=</span> <span class="cn">TRUE</span>, n.sampling <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -533,43 +588,46 @@ component.</p>
 <span><span class="co">#&gt; Initial value of eta: 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.379</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.377</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.553</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.537</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.62</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.613</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.656</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.627</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.675</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.668</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.677</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.686</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.683</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0Oo----------- Convergence achieved -----------oO0</span></span>
 <span></span>
 <span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">summary.fixed</span></span>
-<span><span class="co">#&gt;                   mean         sd 0.025quant   0.5quant  0.975quant       mode</span></span>
-<span><span class="co">#&gt; (Intercept) 58.1707841 5.41513664 46.8447208 58.3644435 68.30505968 58.6735195</span></span>
-<span><span class="co">#&gt; HOVAL       -0.1704185 0.07731244 -0.3222427 -0.1705966 -0.01758118 -0.1709458</span></span>
-<span><span class="co">#&gt; INC         -1.1874464 0.30496204 -1.8018733 -1.1821647 -0.60139055 -1.1707625</span></span>
+<span><span class="co">#&gt;                  mean         sd 0.025quant   0.5quant  0.975quant       mode</span></span>
+<span><span class="co">#&gt; (Intercept) 58.219320 5.39483025  46.865148 58.4245922 68.28364620 58.7400020</span></span>
+<span><span class="co">#&gt; HOVAL       -0.166351 0.07651977  -0.316723 -0.1665204 -0.01504029 -0.1668712</span></span>
+<span><span class="co">#&gt; INC         -1.199818 0.30308608  -1.810483 -1.1944589 -0.61738873 -1.1825220</span></span>
 <span><span class="co">#&gt;                      kld</span></span>
-<span><span class="co">#&gt; (Intercept) 2.248469e-07</span></span>
-<span><span class="co">#&gt; HOVAL       1.069322e-08</span></span>
-<span><span class="co">#&gt; INC         2.582258e-08</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) 1.591415e-07</span></span>
+<span><span class="co">#&gt; HOVAL       1.228513e-08</span></span>
+<span><span class="co">#&gt; INC         2.573901e-08</span></span></code></pre></div>
 <p>We can see in <code>plot(LnGM)</code> that more flexibility was added
 in 2 counties.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ngvb_files/figure-html/unnamed-chunk-22-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-22-2.png" width="672"></p>
+<p><img src="ngvb_files/figure-html/unnamed-chunk-24-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-24-2.png" width="672"></p>
 <p>The Bayes factor is:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">-</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 130411.9</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 77988.96</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-cabral2022controlling" class="csl-entry">
 Cabral, Rafael, David Bolin, and Håvard Rue. 2022. <span>“Controlling
