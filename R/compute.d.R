@@ -58,7 +58,7 @@ compute.d.configs <- function(fit, D.config){
       m       <- configi$improved.mean[matrix.start:matrix.end]
       #Sigma   <- chol2inv(configi$Q[matrix.start:matrix.end, matrix.start:matrix.end]) #this is not the precision matrix of the conditional posterior
       Sigma    <- configi$Qinv[matrix.start:matrix.end, matrix.start:matrix.end] #not Sigma this is diagonal
-      Sigma    <- constraint.matrix.transformation(Sigma, fit$misc$configs$constr$A)
+      #Sigma    <- constraint.matrix.transformation(Sigma, fit$misc$configs$constr$A)
       Di       <- Dfunc(configi$theta)     #Attention configi$theta is in internal scale
       dmatrix[j,] <- ((Di%*%m)^2)[,1] +  diag(Di%*%Sigma%*%t(Di))
       ll[j]   <- configi$log.posterior

@@ -217,12 +217,12 @@ setMethod(f = "fitted", "ngvb.list",
 #' \eqn{\boldsymbol{\theta}} using \code{inla.hypearpar.sample}. It it contains \code{"V"} or \code{"ng"} then
 #' generate samples from the mixing variables \eqn{\mathbf{V}} and \eqn{\eta} for each model component,
 #' respectively.
-#' @param long.tailed Logical. If \code{TRUE} generate long-tailed samples of the the latent field
+#' @param improved.tail Logical. If \code{TRUE} generate leptokurtic samples of the the latent field
 #' \eqn{\mathbf{x}}. It first generates samples of \eqn{(\mathbf{V},\boldsymbol{\theta})} and then
 #' it generates samples of  \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta}, \mathbf{y}}
 #' (which is an LGM) by fitting an INLA model each time and generating n = \code{augmentation} samples.
 #'  Slow. Reduce \code{n.sampling} for speed and increase \code{augmentation} to obtain more samples.
-#' @param augmentation Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
+#' @param augmentation Integer. If \code{improved.tail = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
 #' n = \code{augmentation} samples of \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta} , \mathbf{y}}.
 #' @examples
 #' \dontrun{
@@ -247,7 +247,7 @@ setMethod(f = "fitted", "ngvb.list",
 #' @rdname simulate
 setMethod(f = "simulate", "ngvb.list",
           function(object, n.sampling = object@configs$n.sampling,
-                   components = c("LGM","V","ng"), long.tailed = FALSE,
+                   components = c("LGM","V","ng"), improved.tail = FALSE,
                    augmentation = 10){
 
             ncomp       <- object@configs$ncomp
@@ -259,7 +259,7 @@ setMethod(f = "simulate", "ngvb.list",
             eta.sample   <- list()
             V.sample     <- list()
 
-            if(long.tailed) components <- c(components, "V", "hyperpar")
+            if(improved.tail) components <- c(components, "V", "hyperpar")
 
             if("hyperpar" %in% components){
               hyper.sample <- inla.hyperpar.sample(n.sampling, object@LGM, improve.marginals = TRUE, inter=TRUE)
@@ -366,7 +366,7 @@ setMethod(f = "simulate", "ngvb.list",
               selection   <- object@configs$selection
               fit        <- object@LGM
 
-              if(long.tailed){
+              if(improved.tail){
 
                 inla.fit.V <- object@configs$inla.fit.V
 

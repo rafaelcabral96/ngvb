@@ -8,7 +8,7 @@
   object,
   n.sampling = object@configs$n.sampling,
   components = c("LGM", "V", "ng"),
-  long.tailed = FALSE,
+  improved.tail = FALSE,
   augmentation = 10
 )
 }
@@ -24,13 +24,13 @@ If \code{components} contains \code{"LGM"} then it generates samples of \eqn{(\m
 generate samples from the mixing variables \eqn{\mathbf{V}} and \eqn{\eta} for each model component,
 respectively.}
 
-\item{long.tailed}{Logical. If \code{TRUE} generate long-tailed samples of the the latent field
+\item{improved.tail}{Logical. If \code{TRUE} generate leptokurtic samples of the the latent field
 \eqn{\mathbf{x}}. It first generates samples of \eqn{(\mathbf{V},\boldsymbol{\theta})} and then
 it generates samples of  \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta}, \mathbf{y}}
 (which is an LGM) by fitting an INLA model each time and generating n = \code{augmentation} samples.
  Slow. Reduce \code{n.sampling} for speed and increase \code{augmentation} to obtain more samples.}
 
-\item{augmentation}{Integer. If \code{long.tailed = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
+\item{augmentation}{Integer. If \code{improved.tail = TRUE}, then for each sample of \eqn{(\mathbf{V},\boldsymbol{\theta})} generate
 n = \code{augmentation} samples of \eqn{\mathbf{x} | \mathbf{V} , \boldsymbol{\theta} , \mathbf{y}}.}
 }
 \description{

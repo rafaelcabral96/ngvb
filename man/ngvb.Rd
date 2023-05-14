@@ -7,7 +7,7 @@
 ngvb(
   fit = NULL,
   manual.configs = NULL,
-  selection,
+  selection = NULL,
   alpha.eta = rep(1, length(selection)),
   n.sampling = 1000,
   d.sampling = FALSE,

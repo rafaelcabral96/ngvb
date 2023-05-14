@@ -78,12 +78,17 @@
 #' @export
 #'
 ngvb <- function(fit = NULL, manual.configs = NULL,
-                 selection, alpha.eta = rep(1,length(selection)),
+                 selection = NULL, alpha.eta = rep(1,length(selection)),
                  n.sampling = 1000, d.sampling = FALSE,
                  method = "SCVI", fast = FALSE,
                  verbose = TRUE, history = FALSE,
                  V.init = NULL, eta.init = NULL,
                  iter = 10, stop.rel.change = NULL){
+
+
+  if(is.null(selection)){
+    selection <- lapply(fit$summary.random, FUN = function(x) 1: nrow(x))
+  }
 
 
   start_time <- Sys.time()
@@ -245,7 +250,7 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
           #Vk[j] <- ngme::rGIG(p = -1, a = 1/etak, b = hk[j]^2/etak + Dx[j]^2 )
           Vk[j] <- GIGrvg::rgig(n = 1,
                                 lambda = -1,
-                                psi = 1/eta[k],
+                                psi = 1/etak,
                                 chi = hk[j]^2/eta[k] + Dx[j]^2)
         }
 
@@ -328,7 +333,7 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
           ##  Estimate of V to be used in INLA fit
           ##-----------------------------------------
           eta.prior <- eta.prior.f(dk,hk,alpha.etak,Nk)
-          eta.sample <- sampler.inverseCDF(eta.prior, supp.min = 0, supp.max = 1000, supp.points = 10000, n.samples = n.sampling)
+          eta.sample <- sampler.inverseCDF(eta.prior, supp.min = 0, supp.max = 100, supp.points = 5000, n.samples = n.sampling)
 
           ntotal <- n.sampling*length(hk)
           p      <- rep(-1,ntotal)

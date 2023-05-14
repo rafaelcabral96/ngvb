@@ -13,7 +13,8 @@ RoxygenNote: 7.2.1
 Imports:
     ngme,
     foreach,
-    Matrix
+    Matrix,
+    Rcpp
 Depends:
     INLA,
     GIGrvg
@@ -23,3 +24,5 @@ Suggests:
     spdep,
     rgdal,
 VignetteBuilder: knitr
+LinkingTo: 
+    Rcpp
