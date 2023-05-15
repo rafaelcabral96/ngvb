@@ -18,7 +18,7 @@ geo.plot(
 
 \item{mesh}{inla.mesh object.}
 
-\item{n}{Integer. Plots the index number of the \code{n} indeces with the largest score.}
+\item{n}{Integer. Plots the index number of the \code{n} indeces with the largest BF sensitivity.}
 
 \item{palette}{Character. Palette to use in Leaflet widget.}
 

@@ -1,10 +1,10 @@
 #' @title Print method for "gaussdiag" class
 #'
-#' @description Plots score diagnostics that are the output of the \code{ng.check} function.
-#' It including the contribution of each index in the latent field to the overall Bayes factor (BF)
+#' @description Plots diagnostics that from the output of the \code{ng.check} function.
+#' It includes the contribution of each index in the latent field to the overall Bayes factor (BF)
 #' and the obsedved BF sensitivity compared against the reference distribution.
 #'
-#' @param x List. Output of the \code{ng.score} function
+#' @param x List. Output of the \code{ng.check} function
 #' @param n Integer. Plots the index number of the \code{n} indeces with the largest BF sensitivity.
 #' @param samples Optional vector. Samples of the reference distribution.
 #' @return A list of ggplots:
@@ -40,7 +40,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
     #scale_fill_brewer(palette = "Dark2")+
     xlab("index") +
     ylab(TeX("d_i(\\mathbf{y})")) +
-    ggtitle("Score for each index") +
+    ggtitle("BF sensitivity for each index") +
     scale_alpha(guide = 'none') +
     theme_bw() +
     theme(text = element_text(size = 15))
@@ -77,10 +77,10 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
         scale_colour_manual("",
                             values = c("s(\\mathbf{y}^{pred})" = "black", "s(\\mathbf{y})" = color.vector[i]),
                             labels = c(TeX("s(\\mathbf{y}^{pred})"),TeX("s(\\mathbf{y})")))+
-        xlab("score") +
+        xlab("BF sensitivity") +
         ylab("count") +
         xlim(min(-4*sds[i],x$BF.check$s0.mode[i]*1.1), max(4*sds[i],x$BF.check$s0.mode[i]*1.1)) +
-        ggtitle(paste0("Ref. and obs. score for ", comp.names[i]) ) +
+        ggtitle(paste0("Ref. and obs. BF sensitivity for ", comp.names[i]) ) +
         theme_bw() +
         theme(legend.position = "none") +
         theme(legend.text.align = 0, text = element_text(size = 15))
@@ -98,10 +98,10 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
         scale_colour_manual("",
                             values = c("s(\\mathbf{y}^{pred})" = "black", "s(\\mathbf{y})" = color.vector[i]),
                             labels = c(TeX("s(\\mathbf{y}^{pred})"),TeX("s(\\mathbf{y})")))+
-        xlab("score") +
+        xlab("BF sensitivity") +
         ylab("density") +
         xlim(min(-4*sds[i], x$BF.check$s0.mode[i]*1.1), max(4*sds[i], x$BF.check$s0.mode[i]*1.1)) +
-        ggtitle(paste0("Ref. and obs. score for ", comp.names[i]) ) +
+        ggtitle(paste0("Ref. and obs. BF sensitivity for ", comp.names[i]) ) +
         theme_bw()   +
         theme(legend.position = "none") +
         theme(legend.text.align = 0, text = element_text(size = 15))
@@ -182,7 +182,7 @@ areal.plot <- function(map, data, palette = "YlOrRd", title = "Value"){
 #'
 #' @param data Data frame. Should countain 3 collumns with the latitude, longitude and measurements.
 #' @param mesh inla.mesh object.
-#' @param n Integer. Plots the index number of the \code{n} indeces with the largest score.
+#' @param n Integer. Plots the index number of the \code{n} indeces with the largest BF sensitivity.
 #' @param palette Character. Palette to use in Leaflet widget.
 #' @param domain Vector. Domain to use in palette scale
 #' @param tile.provider Character. Name of the Leaflet tile provider.

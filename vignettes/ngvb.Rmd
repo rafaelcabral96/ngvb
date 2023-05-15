@@ -68,10 +68,10 @@ check.list <- ng.check(LGM)
 ```
 
 
-The diagnostic plots suggest we could benefit from fitting an LnGM. Next, we consider the non-Gaussian version of the previous LGM model, where the latent field is driven by NIG noise. We use the output of the `inla` function `LGM` as the input of the `ngvb` function. First, we need to specify which components will be made non-Gaussian in the `selection` argument. In this case, the RW1 component has the name `x` and dimension 100, so we write `selection = list(x=1:100)`. By default, the leptokurtosis parameter $\eta$ has an exponential prior with rate parameter equal to 1. This can be changed with the argument `alpha.eta`. Run `?ngvb` to see the other arguments.  
+The diagnostic plots suggest we could benefit from fitting an LnGM. Next, we consider the non-Gaussian version of the previous LGM model, where the latent field is driven by NIG noise. We use the output of the `inla` function `LGM` as the input of the `ngvb` function. By default, the leptokurtosis parameter $\eta$ has an exponential prior with rate parameter equal to 1. This can be changed with the argument `alpha.eta`. Run `?ngvb` to see the other arguments.  
 
 ```{r}
-LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+LnGM <- ngvb(fit = LGM)
 ```
 
 
@@ -145,7 +145,7 @@ check.list$sens.fixed.matrix
 However, for illustration purposes, we still fit an LnGM. We consider the prior random effects to be distributed according to long-tailed NIG variables to accommodate possible outliers in the intercepts and slopes.
 
 ```{r, fig.height=5, fig.width=7}
-LnGM <- ngvb(LGM, selection = list(subject = 1:27, subject2 = 1:27))
+LnGM <- ngvb(LGM)
 
 plot(LnGM)
 ```
@@ -338,7 +338,7 @@ check.list <- ng.check(LGM, Dfunc, h)
 The last plots identify an outlying county. To fit the LnGM, we now call `ngvb`, and analyze the output.
 
 ```{r}
-LnGM <- ngvb(manual.configs = manual.configs, selection = list(s=1:N), 
+LnGM <- ngvb(manual.configs = manual.configs, selection = list(s = 1:49),
              iter = 10, d.sampling = TRUE, n.sampling = 1000)
 
 LnGM@LGM$summary.fixed

@@ -7,7 +7,7 @@
 plot.gaussdiag(x, n = rep(0, nrow(x$BF.check)), samples = NULL, ...)
 }
 \arguments{
-\item{x}{List. Output of the \code{ng.score} function}
+\item{x}{List. Output of the \code{ng.check} function}
 
 \item{n}{Integer. Plots the index number of the \code{n} indeces with the largest BF sensitivity.}
 
@@ -21,7 +21,7 @@ A list of ggplots:
  }
 }
 \description{
-Plots score diagnostics that are the output of the \code{ng.check} function.
-It including the contribution of each index in the latent field to the overall Bayes factor (BF)
+Plots diagnostics that from the output of the \code{ng.check} function.
+It includes the contribution of each index in the latent field to the overall Bayes factor (BF)
 and the obsedved BF sensitivity compared against the reference distribution.
 }

@@ -65,8 +65,11 @@
 #'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
 #'                  data = jumpts)
 #'
+#'  #Check adequacy of latent Gaussianity assumption
+#'  check.list <- ng.check(fit = LGM)
+#'
 #'  #Fit LnGM with ngvb
-#'  LnGM <- ngvb(fit = LGM, selection = list(x=1:100))
+#'  LnGM <- ngvb(fit = LGM)
 #'
 #'  #Available methods
 #'  summary(LnGM)

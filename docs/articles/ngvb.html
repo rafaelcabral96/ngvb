@@ -62,7 +62,7 @@
                         <h4 data-toc-skip class="author">Rafael
 Cabral</h4>
             
-            <h4 data-toc-skip class="date">2023-05-14</h4>
+            <h4 data-toc-skip class="date">2023-05-15</h4>
       
       
       <div class="d-none name"><code>ngvb.Rmd</code></div>
@@ -163,47 +163,44 @@ better modelled by an LnGM.</p>
 Next, we consider the non-Gaussian version of the previous LGM model,
 where the latent field is driven by NIG noise. We use the output of the
 <code>inla</code> function <code>LGM</code> as the input of the
-<code>ngvb</code> function. First, we need to specify which components
-will be made non-Gaussian in the <code>selection</code> argument. In
-this case, the RW1 component has the name <code>x</code> and dimension
-100, so we write <code>selection = list(x=1:100)</code>. By default, the
-leptokurtosis parameter <span class="math inline">\(\eta\)</span> has an
-exponential prior with rate parameter equal to 1. This can be changed
-with the argument <code>alpha.eta</code>. Run <code><a href="../reference/ngvb.html">?ngvb</a></code> to see
-the other arguments.</p>
+<code>ngvb</code> function. By default, the leptokurtosis parameter
+<span class="math inline">\(\eta\)</span> has an exponential prior with
+rate parameter equal to 1. This can be changed with the argument
+<code>alpha.eta</code>. Run <code><a href="../reference/ngvb.html">?ngvb</a></code> to see the other
+arguments.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">LGM</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span>fit <span class="op">=</span> <span class="va">LGM</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Warning: You need to add log(|D|) to mll: check inla.doc(generic0)"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 1 -----------oO0</span></span>
 <span><span class="co">#&gt; Initial value of eta: 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 4.784</span></span>
+<span><span class="co">#&gt; Expectation of eta: 4.878</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 3.999</span></span>
+<span><span class="co">#&gt; Expectation of eta: 3.952</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 3.442</span></span>
+<span><span class="co">#&gt; Expectation of eta: 3.423</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 3.068</span></span>
+<span><span class="co">#&gt; Expectation of eta: 3.06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 2.773</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.747</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 2.609</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.616</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 2.53</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.476</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 2.416</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.427</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 2.453</span></span>
+<span><span class="co">#&gt; Expectation of eta: 2.398</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0Oo----------- Maximum number of iterations reached -----------oO0</span></span></code></pre></div>
 <p><code>LnGM</code> is an S4 object of class <code>ngvb.list</code>
@@ -228,7 +225,7 @@ and marginals of the LGM approximation of <span class="math inline">\((x,\theta)
 show next the Bayes factor:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 9.994401e+14</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1.760063e+15</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="random-slople-random-intercept-model-several-model-components">Random slople, random intercept model (several model
@@ -317,39 +314,27 @@ the prior random effects to be distributed according to long-tailed NIG
 variables to accommodate possible outliers in the intercepts and
 slopes.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span><span class="va">LGM</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>subject <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">27</span>, subject2 <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">27</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span><span class="va">LGM</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 1 -----------oO0</span></span>
 <span><span class="co">#&gt; Initial value of eta: 0.5 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.278 0.13</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.302 0.13</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.354 0.154</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.351 0.152</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.372 0.153</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.401 0.151</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.372 0.15</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.388 0.152</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.379 0.154</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.391 0.151</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.397 0.165</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.376 0.162</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.386 0.161</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.365 0.151</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  0Oo----------- Maximum number of iterations reached -----------oO0</span></span>
+<span><span class="co">#&gt;  0Oo----------- Convergence achieved -----------oO0</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ngvb_files/figure-html/unnamed-chunk-14-1.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-14-2.png" width="672"><img src="ngvb_files/figure-html/unnamed-chunk-14-3.png" width="672"></p>
@@ -360,7 +345,7 @@ that a non-Gaussian model for this component is not necessary.</p>
 <p>We show next the Bayes factor:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">-</span> <span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6.051284</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 6.862794</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sar-model-using-manual-configs">SAR model (using manual.configs)<a class="anchor" aria-label="anchor" href="#sar-model-using-manual-configs"></a>
@@ -581,44 +566,50 @@ component.</p>
 <p>The last plots identify an outlying county. To fit the LnGM, we now
 call <code>ngvb</code>, and analyze the output.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span>manual.configs <span class="op">=</span> <span class="va">manual.configs</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">N</span><span class="op">)</span>, </span>
+<code class="sourceCode R"><span><span class="va">LnGM</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ngvb.html">ngvb</a></span><span class="op">(</span>manual.configs <span class="op">=</span> <span class="va">manual.configs</span>, selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>s <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">49</span><span class="op">)</span>,</span>
 <span>             iter <span class="op">=</span> <span class="fl">10</span>, d.sampling <span class="op">=</span> <span class="cn">TRUE</span>, n.sampling <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 1 -----------oO0</span></span>
 <span><span class="co">#&gt; Initial value of eta: 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 2 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.377</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.36</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 3 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.537</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.541</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 4 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.613</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.605</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 5 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.627</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.655</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 6 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.668</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.666</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 7 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.686</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.645</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; 0Oo----------- Iteration 8 -----------oO0</span></span>
-<span><span class="co">#&gt; Expectation of eta: 0.683</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.672</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 0Oo----------- Iteration 9 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.681</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 0Oo----------- Iteration 10 -----------oO0</span></span>
+<span><span class="co">#&gt; Expectation of eta: 0.687</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0Oo----------- Convergence achieved -----------oO0</span></span>
 <span></span>
 <span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">summary.fixed</span></span>
-<span><span class="co">#&gt;                  mean         sd 0.025quant   0.5quant  0.975quant       mode</span></span>
-<span><span class="co">#&gt; (Intercept) 58.219320 5.39483025  46.865148 58.4245922 68.28364620 58.7400020</span></span>
-<span><span class="co">#&gt; HOVAL       -0.166351 0.07651977  -0.316723 -0.1665204 -0.01504029 -0.1668712</span></span>
-<span><span class="co">#&gt; INC         -1.199818 0.30308608  -1.810483 -1.1944589 -0.61738873 -1.1825220</span></span>
+<span><span class="co">#&gt;                   mean         sd 0.025quant   0.5quant  0.975quant       mode</span></span>
+<span><span class="co">#&gt; (Intercept) 58.2211212 5.38888939 46.9580137 58.4203214 68.29904011 58.7650042</span></span>
+<span><span class="co">#&gt; HOVAL       -0.1663135 0.07726016 -0.3180045 -0.1665085 -0.01352487 -0.1668969</span></span>
+<span><span class="co">#&gt; INC         -1.1950034 0.30496795 -1.8095714 -1.1893868 -0.61022283 -1.1768686</span></span>
 <span><span class="co">#&gt;                      kld</span></span>
-<span><span class="co">#&gt; (Intercept) 1.591415e-07</span></span>
-<span><span class="co">#&gt; HOVAL       1.228513e-08</span></span>
-<span><span class="co">#&gt; INC         2.573901e-08</span></span></code></pre></div>
+<span><span class="co">#&gt; (Intercept) 7.312655e-08</span></span>
+<span><span class="co">#&gt; HOVAL       1.080458e-08</span></span>
+<span><span class="co">#&gt; INC         2.704894e-08</span></span></code></pre></div>
 <p>We can see in <code>plot(LnGM)</code> that more flexibility was added
 in 2 counties.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
@@ -627,7 +618,7 @@ in 2 counties.</p>
 <p>The Bayes factor is:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">LnGM</span><span class="op">@</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">-</span><span class="va">LGM</span><span class="op">$</span><span class="va">mlik</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 77988.96</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 111510.8</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-cabral2022controlling" class="csl-entry">
 Cabral, Rafael, David Bolin, and Håvard Rue. 2022. <span>“Controlling
