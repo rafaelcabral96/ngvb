@@ -364,7 +364,7 @@ setMethod(f = "simulate", "ngvb.list",
 
             if("LGM" %in% components){
               selection   <- object@configs$selection
-              fit        <- object@LGM
+              fit         <- object@LGM
 
               if(improved.tail){
 

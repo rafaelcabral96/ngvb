@@ -63,10 +63,8 @@
 #'
 #'  #Fit LGM with INLA
 #'  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
-#'                  data = jumpts)
-#'
-#'  #Check adequacy of latent Gaussianity assumption
-#'  check.list <- ng.check(fit = LGM)
+#'                  data = jumpts,
+#'                  control.compute = list(config = TRUE))
 #'
 #'  #Fit LnGM with ngvb
 #'  LnGM <- ngvb(fit = LGM)
@@ -191,6 +189,8 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
 
   fit$ngvb$V      <- V
   fit$ngvb$eta    <- eta
+
+
   fits <- addconfigs(fits, list(h = h, alpha.eta = alpha.eta, method = method,
                                 N = N, ncomp = ncomp, selection = selection,
                                 n.sampling = n.sampling,
@@ -221,8 +221,6 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
       if(d.sampling){d <- suppressWarnings(compute.d.sampling(fit, D.config)) }
       else{          d <- compute.d.configs(fit, D.config) }
     }
-
-
     if (method == "Gibbs"){
 
       samples <- inla.posterior.sample(n = 1, fit, selection = selection,

@@ -283,7 +283,7 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
 
   for(i in 1:n.config){
     mean.list[[i]]  <- fit$misc$configs$config[[i]]$mean
-    Qinv.list[[i]]  <- fit$misc$configs$config[[i]]$Qinv #avoid this use Qinv
+    Qinv.list[[i]]  <- fit$misc$configs$config[[i]]$Qinv #avoid this use Qinv try solve here...
     if(n.config == 1){
       if(fit$.args$control.inla$int.strategy=="eb"){
         theta.list[[i]]  <- fit$mode$theta
