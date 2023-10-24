@@ -302,10 +302,9 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
 
 
   score.list          <- replicate(n.comp,list())         #score S_0(y,gamma)
-  I0.list             <- replicate(n.comp,list())         #information I_0(y,gamma)
   variance.ref.list   <- replicate(n.comp,list())         #variance of the reference distribution for each gamma
-  p.value.global.list <- replicate(n.comp,list())         #pvalue(y,gamma)
-  p.value.index.list  <- replicate(n.comp,list())
+  p.value.global.list <- replicate(n.comp,list())         #pvalue(y,gamma) using I_0 approximation for variance
+  p.value.index.list  <- replicate(n.comp,list())         #pvalue(y,gamma) for each location for Gaussian simulated data
   p.value.index       <- list()
   score.index         <- list()
   score               <- numeric(n.comp)
@@ -316,8 +315,8 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
 
 
   if(compute.I0){
-    I0      <- numeric(n.comp)   #I0(y)
-    I0.list <- list()            #I0(y,gamma)
+    I0      <- numeric(n.comp)                  #I0(y)
+    I0.list <- replicate(n.comp,list())         #information I_0(y,gamma)
   }
 
   for(j in 1:n.comp){
@@ -327,6 +326,7 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
     init    <- fit$misc$configs$contents$start[sel.tag]
     end     <- init + fit$misc$configs$contents$length[sel.tag] -1
     sel     <- init:end
+    I0.negative <- FALSE
 
     #computing mean and variances od [DX]---------------------------
     for(k in 1:n.config){
@@ -341,8 +341,9 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
       d.4.k <- ( mu.Dx.k^4 + 6*mu.Dx.k^2*var.Dx.k + 3*var.Dx.k^2 )
       score.list[[j]][[k]] <- ( 3*hj^2 - 6*hj*d.2.k + d.4.k ) / ( 8*hj^3 )
 
+
       if(compute.I0){
-        d.6 <- mu.Dx.k^6 + 15*mu.Dx.k^4*var.Dx.k + 45*mu.Dx.k^2*var.Dx.k^2 + 15*var.Dx.k^3
+        d.6.k <- mu.Dx.k^6 + 15*mu.Dx.k^4*var.Dx.k + 45*mu.Dx.k^2*var.Dx.k^2 + 15*var.Dx.k^3
 
         weird1 <- weird1compute(mu.Dx.k,var.Dx.k,hj)
         weird2 <- weird2compute(mu.Dx.k,as.matrix(Sigma.Dx.k),hj)
@@ -350,20 +351,25 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
         Varf   <- weird - sum(score.list[[j]][[k]])^2
 
         I0.list[[j]][[k]]             <- sum( ( 3*hj^3 + 3*hj^2*d.2.k -6*hj*d.4.k + d.6.k ) / ( 8*hj^5 ) )  - Varf
-        p.value.global.list[[j]][[k]] <-  1 - pnorm(sum(score.list[[j]][[k]]), sd = sqrt(I0.list[[j]][[k]]))
-
+        if(I0.list[[j]][[k]] < 0 )  I0.negative <- TRUE
+        suppressWarnings({
+        p.value.global.list[[j]][[k]] <-  1 - pnorm(sum(score.list[[j]][[k]]), sd = sqrt(I0.list[[j]][[k]]))})
       }
 
       #compute variance of the reference distribution
-      if((!compute.I0) && fit$.args$family == "gaussian"){
+      if(fit$.args$family == "gaussian"){
         Gamma                          <- -Sigma.Dx.k + diag(h[[j]])
         p.value.index.list[[j]][[k]]   <-  pvalue.d(score.list[[j]][[k]], h[[j]], diag(Gamma))
 
         variance.ref.list[[j]][[k]]   <-  (3/8)*(t(h[[j]]^(-3))%*%(Gamma^4)%*%(h[[j]]^(-3)))[1,1]
         p.value.global.list[[j]][[k]] <-  1 - pnorm(sum(score.list[[j]][[k]]), sd = sqrt(variance.ref.list[[j]][[k]]))
 
-       }
+      }
 
+    }
+
+    if(I0.negative){
+      print("Some I_0 take negative values. p-value not reported.")
     }
 
     #Now do weighted average - score
@@ -392,7 +398,9 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
   }
 
   names(score.index)    <- comp.names
-  names(p.value.index)  <- comp.names
+  if(fit$.args$family == "gaussian"){
+    names(p.value.index)  <- comp.names
+  }
   names(score)          <- comp.names
   score.dataframe       <- data.frame(s0 = score, s0.mode = s0.mode, var.ref.mode = var.ref.mode)
 
@@ -454,3 +462,4 @@ custom.weighted.mean <- function(list, w){
   }
   return(out)
 }
+
