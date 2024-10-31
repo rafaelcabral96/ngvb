@@ -12,6 +12,8 @@ install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-dow
 remotes::install_github("davidbolin/ngme2", ref = "devel")
 ```
 
+For more details on installation, visit the [ngme2 webpage](https://davidbolin.github.io/ngme2/) and the [R-INLA webpage](https://www.r-inla.org/)
+
 The `ngvb` package can be installed using the command:
 
 ```
