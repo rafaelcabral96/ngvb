@@ -97,7 +97,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
                    size=1.5) +
         scale_colour_manual("",
                             values = c("s(\\mathbf{y}^{pred})" = "black", "s(\\mathbf{y})" = color.vector[i]),
-                            labels = c(TeX("s(\\mathbf{y}^{pred})"),TeX("s(\\mathbf{y})")))+
+                            labels = c(TeXlibrary("s(\\mathbf{y}^{pred})"),TeX("s(\\mathbf{y})")))+
         xlab("BF sensitivity") +
         ylab("density") +
         xlim(min(-4*sds[i], x$BF.check$s0.mode[i]*1.1), max(4*sds[i], x$BF.check$s0.mode[i]*1.1)) +

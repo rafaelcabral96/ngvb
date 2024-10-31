@@ -9,7 +9,7 @@ It requires the packages `INLA` and `ngme` which can be installed by:
 
 ```
 install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
-remotes::install_github("davidbolin/ngme", ref = "devel")
+remotes::install_github("davidbolin/ngme2", ref = "devel")
 ```
 
 The `ngvb` package can be installed using the command:
