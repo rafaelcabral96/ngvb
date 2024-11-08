@@ -288,7 +288,7 @@ setMethod(f = "simulate", "ngvb.list",
                     p      <- rep(-1,ntotal)
                     a      <- rep(1/eta.s, each=length(hk))
                     b      <- c(t(outer(eta.s, hk, FUN = function(x,y) y^2/x))) + rep(dk,length(eta.s))
-                    Vm     <- matrix(1/ngme::rGIG(p,a,b), nrow = n.sampling, ncol = length(hk), byrow = TRUE)
+                    Vm     <- matrix(1/ngme2::rgig(length(p),p,a,b), nrow = n.sampling, ncol = length(hk), byrow = TRUE)
 
                     V.sample[[k]]   <- 1/Vm
                     eta.sample[[k]] <- eta.s
@@ -313,7 +313,7 @@ setMethod(f = "simulate", "ngvb.list",
                   p      <- rep(object@summary.mixing$GIG.p, each = n.sampling)
                   a      <- rep(object@summary.mixing$GIG.a, each = n.sampling)
                   b      <- rep(object@summary.mixing$GIG.b, each = n.sampling)
-                  Vm     <- matrix(ngme::rGIG(p,a,b), nrow = n.sampling, ncol = length(hk), byrow = FALSE)
+                  Vm     <- matrix(ngme2::rgig(length(p),p,a,b), nrow = n.sampling, ncol = length(hk), byrow = FALSE)
                   V.sample[[k]]   <- Vm
                 }
               }
@@ -354,7 +354,7 @@ setMethod(f = "simulate", "ngvb.list",
                   p      <- rep(summary.mixing.k$GIG.p, each = n.sampling)
                   a      <- rep(summary.mixing.k$GIG.a, each = n.sampling)
                   b      <- rep(summary.mixing.k$GIG.b, each = n.sampling)
-                  eta.sample[[k]]     <- ngme::rGIG(p,a,b)
+                  eta.sample[[k]]     <- ngme2::rgig(length(p),p,a,b)
                 }
               }
 

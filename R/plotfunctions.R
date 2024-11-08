@@ -39,7 +39,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
     #scale_color_brewer(palette = "Dark2")+
     #scale_fill_brewer(palette = "Dark2")+
     xlab("index") +
-    ylab(TeX("d_i(\\mathbf{y})")) +
+    ylab(latex2exp::TeX("d_i(\\mathbf{y})")) +
     ggtitle("BF sensitivity for each index") +
     scale_alpha(guide = 'none') +
     theme_bw() +
@@ -62,6 +62,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
 
   plot.ref <- list()
 
+  suppressWarnings(
   for(i in 1:n.comps){
 
     if(!is.null(samples)){
@@ -76,7 +77,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
                    size=1.5) +
         scale_colour_manual("",
                             values = c("s(\\mathbf{y}^{pred})" = "black", "s(\\mathbf{y})" = color.vector[i]),
-                            labels = c(TeX("s(\\mathbf{y}^{pred})"),TeX("s(\\mathbf{y})")))+
+                            labels = c(latex2exp::TeX("s(\\mathbf{y}^{pred})"),latex2exp::TeX("s(\\mathbf{y})")))+
         xlab("BF sensitivity") +
         ylab("count") +
         xlim(min(-4*sds[i],x$BF.check$s0.mode[i]*1.1), max(4*sds[i],x$BF.check$s0.mode[i]*1.1)) +
@@ -97,7 +98,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
                    size=1.5) +
         scale_colour_manual("",
                             values = c("s(\\mathbf{y}^{pred})" = "black", "s(\\mathbf{y})" = color.vector[i]),
-                            labels = c(TeXlibrary("s(\\mathbf{y}^{pred})"),TeX("s(\\mathbf{y})")))+
+                            labels = c(latex2exp::TeX("s(\\mathbf{y}^{pred})"),latex2exp::TeX("s(\\mathbf{y})")))+
         xlab("BF sensitivity") +
         ylab("density") +
         xlim(min(-4*sds[i], x$BF.check$s0.mode[i]*1.1), max(4*sds[i], x$BF.check$s0.mode[i]*1.1)) +
@@ -109,7 +110,7 @@ plot.gaussdiag <- function(x, n = rep(0,nrow(x$BF.check)), samples = NULL, ...){
     }
 
 
-  }
+  })
 
 
   return(list(plot.ranking = plot.ranking, plot.ref = plot.ref))

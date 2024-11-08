@@ -323,7 +323,7 @@ score.mixture.compute <- function(fit, Dfunc, h, selection, compute.I0){
     hj      <- h[[j]]
 
     sel.tag <- fit$misc$configs$contents$tag == comp.names[j]
-    init    <- fit$misc$configs$contents$start[sel.tag]
+    init    <- fit$misc$configs$contents$start[sel.tag] - fit$misc$configs$contents$length[1]
     end     <- init + fit$misc$configs$contents$length[sel.tag] -1
     sel     <- init:end
     I0.negative <- FALSE

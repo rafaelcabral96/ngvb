@@ -340,7 +340,7 @@ ngvb <- function(fit = NULL, manual.configs = NULL,
           p      <- rep(-1,ntotal)
           a      <- rep(1/eta.sample, each=length(hk))
           b      <- c(t(outer(eta.sample, hk, FUN = function(x,y) y^2/x))) + rep(dk,length(eta.sample))
-          Vm     <- matrix(1/ngme::rGIG(p,a,b), nrow = n.sampling, ncol = length(hk), byrow = TRUE)
+          Vm     <- matrix(1/ngme2::rgig(length(p),p,a,b), nrow = n.sampling, ncol = length(hk), byrow = TRUE)
           EVm1   <- colMeans(Vm)
 
           V[[k]]       <- unname(1/EVm1)

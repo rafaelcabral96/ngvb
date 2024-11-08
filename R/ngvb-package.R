@@ -4,7 +4,7 @@
 #' @import ggplot2
 ## usethis namespace: start
 #' @importFrom Rcpp sourceCpp
-#' @importFrom ngme2 rGIG
+#' @importFrom ngme2 rgig
 #' @importFrom scales hue_pal
 #' @importFrom latex2exp TeX
 #' @importFrom ggpubr ggarrange

@@ -101,10 +101,8 @@ Run `devtools::build_vignettes("ngvb")` and `vignette("ngvb")` to see several us
 
  #Fit LGM with INLA
  LGM     <- inla(y ~ -1 + f(x,  model = "rw1"),
-                 data = jumpts)
-
- #Check adequacy of latent Gaussianity assumption
- check.list <- ng.check(fit = LGM)
+                 data = jumpts,
+                 control.compute = list(config = TRUE))
 
  #Fit LnGM with ngvb
  LnGM <- ngvb(fit = LGM)

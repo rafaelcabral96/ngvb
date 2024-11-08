@@ -1,5 +1,5 @@
 rGIG <- function(n.sample, p, a, b){
-  return(ngme::rGIG(p = rep(p, n.sample),
+  return(ngme2::rgig(p = rep(p, n.sample),
                     a = rep(a, n.sample),
                     b = rep(b, n.sample)))
 }
