@@ -15,7 +15,8 @@ Imports:
     foreach,
     Matrix,
     Rcpp,
-    latex2exp
+    latex2exp,
+    GIGrvg,
 Depends:
     INLA
 Suggests: 
